@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import CertificatePageClient from "./pageClient";
 
 interface Certificate {
@@ -21,30 +22,86 @@ interface Certificate {
 }
 
 async function getCertificate(id: string): Promise<Certificate> {
-  // ✅ Use relative path for server-side fetch
-  const res = await fetch(`https://lioran.group/api/certificates/${id}`, { cache: "no-store" });
+  const res = await fetch(
+    `https://lioran.group/api/certificates/${id}`,
+    { cache: "no-store" }
+  );
 
   if (!res.ok) {
     throw new Error("Certificate not found");
   }
 
   const data = await res.json();
-  return data.data; // returns the certificate object
+  return data.data;
 }
 
+/* -----------------------------------------
+   🔹 Dynamic Metadata
+------------------------------------------ */
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  try {
+    const certificate = await getCertificate(params.id);
+
+    const title = `${certificate.name} – Certificate of ${certificate.role}`;
+    const description =
+      certificate.description ||
+      `Official certificate issued by ${certificate.organization} for ${certificate.name}.`;
+
+    const url = `https://lioran.group/certificate/${params.id}`;
+
+    return {
+      title,
+      description,
+      metadataBase: new URL("https://lioran.group"),
+      alternates: {
+        canonical: url,
+      },
+      openGraph: {
+        title,
+        description,
+        url,
+        siteName: "Lioran Group",
+        type: "article",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
+    };
+  } catch {
+    return {
+      title: "Certificate Not Found | Lioran Group",
+      description: "The requested certificate does not exist or is invalid.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+}
+
+/* -----------------------------------------
+   🔹 Page Component
+------------------------------------------ */
 export default async function CertificatePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
-
   let certificate: Certificate;
 
   try {
-    certificate = await getCertificate(id);
-  } catch (error) {
-    // If API fails, show 404
+    certificate = await getCertificate(params.id);
+  } catch {
     notFound();
   }
 
