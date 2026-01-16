@@ -54,7 +54,7 @@ export async function generateMetadata({
       `Official certificate issued by ${certificate.organization} for ${certificate.name}.`;
 
     const url = `https://lioran.group/certificate/${id}`;
-    const ogImage = `/certificate/${id}/opengraph-image`;
+    const ogImage = `https://lioran.group/certificate/${id}/opengraph-image`;
 
     return {
       title,
