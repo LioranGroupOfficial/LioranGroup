@@ -36,27 +36,28 @@ async function getCertificate(id: string): Promise<Certificate> {
 }
 
 /* -----------------------------------------
-   🔹 Dynamic Metadata
+   ✅ FIXED: generateMetadata
 ------------------------------------------ */
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const { id } = await params; // ✅ unwrap params
+
   try {
-    const certificate = await getCertificate(params.id);
+    const certificate = await getCertificate(id);
 
     const title = `${certificate.name} – Certificate of ${certificate.role}`;
     const description =
       certificate.description ||
       `Official certificate issued by ${certificate.organization} for ${certificate.name}.`;
 
-    const url = `https://lioran.group/certificate/${params.id}`;
+    const url = `https://lioran.group/certificate/${id}`;
 
     return {
       title,
       description,
-      metadataBase: new URL("https://lioran.group"),
       alternates: {
         canonical: url,
       },
@@ -90,17 +91,19 @@ export async function generateMetadata({
 }
 
 /* -----------------------------------------
-   🔹 Page Component
+   ✅ Page Component
 ------------------------------------------ */
 export default async function CertificatePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params; // ✅ unwrap params
+
   let certificate: Certificate;
 
   try {
-    certificate = await getCertificate(params.id);
+    certificate = await getCertificate(id);
   } catch {
     notFound();
   }
