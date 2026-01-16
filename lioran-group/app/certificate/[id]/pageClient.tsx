@@ -78,131 +78,211 @@ export default function CertificatePageClient({ certificate }: Props) {
 
 
   const generatePdf = async () => {
-    const pdfDoc = await PDFDocument.create();
+  const pdfDoc = await PDFDocument.create();
 
-    const page = pdfDoc.addPage([842, 595]); // Landscape A4
-    const { width, height } = page.getSize();
+  const page = pdfDoc.addPage([842, 595]); // Landscape A4
+  const { width, height } = page.getSize();
 
-    const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-    // Background color (optional)
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width,
-      height,
-      color: rgb(0.05, 0.05, 0.05),
-    });
+  /* ---------- Helpers ---------- */
+  const drawWrappedText = ({
+    text,
+    x,
+    y,
+    maxWidth,
+    size,
+    font,
+    color,
+    lineHeight = size + 6,
+  }: {
+    text: string;
+    x: number;
+    y: number;
+    maxWidth: number;
+    size: number;
+    font: any;
+    color: any;
+    lineHeight?: number;
+  }) => {
+    const words = text.split(" ");
+    let line = "";
+    let cursorY = y;
 
-    // Header
-    page.drawText("Certificate of Achievement", {
-      x: width / 2 - 180,
-      y: height - 100,
-      size: 32,
-      font,
-      color: rgb(1, 1, 1),
-    });
-    page.drawText("This certificate is proudly presented to", {
-      x: width / 2 - 180,
-      y: height - 140,
-      size: 16,
-      font: fontRegular,
-      color: rgb(0.8, 0.8, 0.8),
-    });
+    for (const word of words) {
+      const testLine = line + word + " ";
+      const testWidth = font.widthOfTextAtSize(testLine, size);
 
-    // Recipient Name & Role
-    page.drawText(certificate.name, {
-      x: width / 2 - 150,
-      y: height - 180,
-      size: 28,
-      font,
-      color: rgb(1, 1, 1),
-    });
-    page.drawText(certificate.role, {
-      x: width / 2 - 150,
-      y: height - 210,
-      size: 20,
-      font: fontRegular,
-      color: rgb(0.8, 0.8, 0.8),
-    });
+      if (testWidth > maxWidth && line !== "") {
+        page.drawText(line, { x, y: cursorY, size, font, color });
+        line = word + " ";
+        cursorY -= lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
 
-    // Certificate details
-    let detailY = height - 250;
-    const lineHeight = 20;
+    if (line) {
+      page.drawText(line, { x, y: cursorY, size, font, color });
+      cursorY -= lineHeight;
+    }
 
-    const details = [
-      `Contribution: ${certificate.contribution}`,
-      certificate.description ? `Description: ${certificate.description}` : null,
-      `Organization: ${certificate.organization}`,
-      `Duration: ${certificate.duration} (${certificate.startDate} - ${certificate.endDate})`,
-      `Issued By: ${certificate.issuedBy} on ${certificate.issueDate}`,
-    ].filter(Boolean) as string[];
+    return cursorY;
+  };
 
-    details.forEach((line) => {
-      page.drawText(line, {
-        x: 50,
-        y: detailY,
-        size: 14,
-        font: fontRegular,
-        color: rgb(1, 1, 1),
-      });
-      detailY -= lineHeight;
-    });
+  /* ---------- Background ---------- */
+  page.drawRectangle({
+    x: 0,
+    y: 0,
+    width,
+    height,
+    color: rgb(0.05, 0.05, 0.05),
+  });
 
-    // Generate QR Code as data URL using 'qrcode' library
-    const qrDataUrl = await QRCode.toDataURL(certificate.verificationUrl, {
-      width: 150,
-      margin: 1,
-      color: {
-        dark: "#ffffff",
-        light: "#1f2937",
-      },
-    });
+  /* ---------- Header ---------- */
+  page.drawText("Certificate of Achievement", {
+    x: width / 2 - 200,
+    y: height - 100,
+    size: 32,
+    font,
+    color: rgb(1, 1, 1),
+  });
 
-    const qrImageBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());
-    const qrImage = await pdfDoc.embedPng(qrImageBytes);
+  page.drawText("This certificate is proudly presented to", {
+    x: width / 2 - 180,
+    y: height - 140,
+    size: 16,
+    font: fontRegular,
+    color: rgb(0.8, 0.8, 0.8),
+  });
 
-    page.drawImage(qrImage, {
+  /* ---------- Name & Role ---------- */
+  page.drawText(certificate.name, {
+    x: width / 2 - 150,
+    y: height - 180,
+    size: 28,
+    font,
+    color: rgb(1, 1, 1),
+  });
+
+  page.drawText(certificate.role, {
+    x: width / 2 - 150,
+    y: height - 210,
+    size: 20,
+    font: fontRegular,
+    color: rgb(0.8, 0.8, 0.8),
+  });
+
+  /* ---------- Details (Wrapped) ---------- */
+  let cursorY = height - 260;
+  const maxTextWidth = width - 100; // left 50, right 50
+
+  cursorY = drawWrappedText({
+    text: `Contribution: ${certificate.contribution}`,
+    x: 50,
+    y: cursorY,
+    maxWidth: maxTextWidth,
+    size: 14,
+    font: fontRegular,
+    color: rgb(1, 1, 1),
+  });
+
+  if (certificate.description) {
+    cursorY = drawWrappedText({
+      text: `Description: ${certificate.description}`,
       x: 50,
-      y: 50,
-      width: 150,
-      height: 150,
-    });
-
-    // Signature Image
-    const signatureBytes = await convertSignatureToWhite("/signs/cto.png");
-    const signatureImage = await pdfDoc.embedPng(signatureBytes);
-
-
-    // Draw signature with a white tint to make it visible on a black background
-    page.drawImage(signatureImage, {
-      x: width - 200,
-      y: 50,
-      width: 150,
-      height: 50,
-    });
-
-    page.drawText("Swaraj Puppalwar", {
-      x: width - 200,
-      y: 40,
+      y: cursorY,
+      maxWidth: maxTextWidth,
       size: 14,
       font: fontRegular,
       color: rgb(1, 1, 1),
     });
+  }
 
-    page.drawText("CTO, Lioran Group", {
-      x: width - 200,
-      y: 25,
-      size: 12,
-      font: fontRegular,
-      color: rgb(0.8, 0.8, 0.8),
-    });
+  cursorY = drawWrappedText({
+    text: `Organization: ${certificate.organization}`,
+    x: 50,
+    y: cursorY,
+    maxWidth: maxTextWidth,
+    size: 14,
+    font: fontRegular,
+    color: rgb(1, 1, 1),
+  });
 
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
-    saveAs(blob, `Certificate_${certificate.name}.pdf`);
-  };
+  cursorY = drawWrappedText({
+    text: `Duration: ${certificate.duration} (${certificate.startDate} - ${certificate.endDate})`,
+    x: 50,
+    y: cursorY,
+    maxWidth: maxTextWidth,
+    size: 14,
+    font: fontRegular,
+    color: rgb(1, 1, 1),
+  });
+
+  cursorY = drawWrappedText({
+    text: `Issued By: ${certificate.issuedBy} on ${certificate.issueDate}`,
+    x: 50,
+    y: cursorY,
+    maxWidth: maxTextWidth,
+    size: 14,
+    font: fontRegular,
+    color: rgb(1, 1, 1),
+  });
+
+  /* ---------- QR Code ---------- */
+  const qrDataUrl = await QRCode.toDataURL(certificate.verificationUrl, {
+    width: 150,
+    margin: 1,
+    color: {
+      dark: "#ffffff",
+      light: "#1f2937",
+    },
+  });
+
+  const qrImageBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());
+  const qrImage = await pdfDoc.embedPng(qrImageBytes);
+
+  page.drawImage(qrImage, {
+    x: 50,
+    y: 50,
+    width: 150,
+    height: 150,
+  });
+
+  /* ---------- Signature ---------- */
+  const signatureBytes = await convertSignatureToWhite("/signs/cto.png");
+  const signatureImage = await pdfDoc.embedPng(signatureBytes);
+
+  page.drawImage(signatureImage, {
+    x: width - 200,
+    y: 50,
+    width: 150,
+    height: 50,
+  });
+
+  page.drawText("Swaraj Puppalwar", {
+    x: width - 200,
+    y: 40,
+    size: 14,
+    font: fontRegular,
+    color: rgb(1, 1, 1),
+  });
+
+  page.drawText("CTO, Lioran Group", {
+    x: width - 200,
+    y: 25,
+    size: 12,
+    font: fontRegular,
+    color: rgb(0.8, 0.8, 0.8),
+  });
+
+  /* ---------- Save ---------- */
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+  saveAs(blob, `Certificate_${certificate.name}.pdf`);
+};
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black p-6 space-y-6">
@@ -261,7 +341,7 @@ export default function CertificatePageClient({ certificate }: Props) {
             <div>
               <QRCodeCanvas
                 value={certificate.verificationUrl}
-                size={150}
+                size={200}
                 bgColor="#1f2937"
                 fgColor="#ffffff"
                 level="H"
