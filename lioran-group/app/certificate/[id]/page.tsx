@@ -36,14 +36,14 @@ async function getCertificate(id: string): Promise<Certificate> {
 }
 
 /* -----------------------------------------
-   ✅ FIXED: generateMetadata
+   ✅ Dynamic Metadata
 ------------------------------------------ */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params; // ✅ unwrap params
+  const { id } = await params;
 
   try {
     const certificate = await getCertificate(id);
@@ -54,6 +54,7 @@ export async function generateMetadata({
       `Official certificate issued by ${certificate.organization} for ${certificate.name}.`;
 
     const url = `https://lioran.group/certificate/${id}`;
+    const ogImage = `/certificate/${id}/opengraph-image`;
 
     return {
       title,
@@ -67,11 +68,20 @@ export async function generateMetadata({
         url,
         siteName: "Lioran Group",
         type: "article",
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: `Certificate issued to ${certificate.name}`,
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
+        images: [ogImage],
       },
       robots: {
         index: true,
@@ -98,7 +108,7 @@ export default async function CertificatePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // ✅ unwrap params
+  const { id } = await params;
 
   let certificate: Certificate;
 
