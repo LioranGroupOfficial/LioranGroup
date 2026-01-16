@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
-import { ICertificate } from "@/types/certificate";
+import { ICertificate } from "../types/certificate";
 
 const CertificateSchema = new Schema<ICertificate>(
   {
