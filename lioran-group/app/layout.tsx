@@ -6,6 +6,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "Lioran Group",
+  metadataBase: new URL("https://lioran.group"),
   description:
     "Lioran Group – Building technology-driven ventures from India. Head Office in Chandrapur, Maharashtra.",
   keywords: ["Lioran Group", "LCS", "Hushar Spreadsheet", "Lioran Cloud", "Lioran Spreadsheet", "Lioran"],
