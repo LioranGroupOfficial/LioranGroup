@@ -22,7 +22,7 @@ interface Certificate {
 
 async function getCertificate(id: string): Promise<Certificate> {
   // ✅ Use relative path for server-side fetch
-  const res = await fetch(`/api/certificates/${id}`, { cache: "no-store" });
+  const res = await fetch(`https://lioran.group/api/certificates/${id}`, { cache: "no-store" });
 
   if (!res.ok) {
     throw new Error("Certificate not found");

@@ -8,14 +8,26 @@ export default function GenerateCertificatePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
+  // Pre-fill default dates: endDate = today, startDate = 1 month ago
+  const today = new Date();
+  const endDateDefault = today.toISOString().split("T")[0];
+  const startDateDefault = new Date(
+    today.getFullYear(),
+    today.getMonth() - 1,
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   const [form, setForm] = useState({
-    name: "",
-    role: "",
-    contribution: "",
-    description: "",
-    startDate: "",
-    endDate: "",
-    duration: "",
+    name: "John Doe",
+    role: "Open Source Contributor",
+    contribution: "Participated in Lioran Group open-source project",
+    description:
+      "This certificate is awarded for valuable contributions to the open-source community under Lioran Group. Your efforts and dedication have made a significant impact.",
+    startDate: startDateDefault,
+    endDate: endDateDefault,
+    duration: "1 month",
   });
 
   useEffect(() => {
@@ -97,12 +109,42 @@ export default function GenerateCertificatePage() {
         </h1>
 
         <div className="grid grid-cols-2 gap-4">
-          <input name="name" placeholder="Full Name" onChange={handleChange} />
-          <input name="role" placeholder="Role" onChange={handleChange} />
-          <input name="duration" placeholder="Duration" onChange={handleChange} />
-          <input name="contribution" placeholder="Contribution" onChange={handleChange} />
-          <input name="startDate" type="date" onChange={handleChange} />
-          <input name="endDate" type="date" onChange={handleChange} />
+          <input
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+          />
+          <input
+            name="role"
+            placeholder="Role"
+            value={form.role}
+            onChange={handleChange}
+          />
+          <input
+            name="duration"
+            placeholder="Duration"
+            value={form.duration}
+            onChange={handleChange}
+          />
+          <input
+            name="contribution"
+            placeholder="Contribution"
+            value={form.contribution}
+            onChange={handleChange}
+          />
+          <input
+            name="startDate"
+            type="date"
+            value={form.startDate}
+            onChange={handleChange}
+          />
+          <input
+            name="endDate"
+            type="date"
+            value={form.endDate}
+            onChange={handleChange}
+          />
         </div>
 
         <textarea
@@ -110,6 +152,7 @@ export default function GenerateCertificatePage() {
           placeholder="Description"
           className="w-full mt-4"
           rows={4}
+          value={form.description}
           onChange={handleChange}
         />
 
