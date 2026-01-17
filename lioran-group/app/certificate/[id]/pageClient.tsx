@@ -337,29 +337,29 @@ export default function CertificatePageClient({ certificate }: Props) {
             </p>
           </div>
 
-          <div className="flex justify-between items-start mt-10">
+            <div className="flex flex-col space-y-6 mt-10 md:flex-row md:justify-between md:items-start">
             <div>
               <QRCodeCanvas
-                value={certificate.verificationUrl}
-                size={200}
-                bgColor="#1f2937"
-                fgColor="#ffffff"
-                level="H"
+              value={certificate.verificationUrl}
+              size={200}
+              bgColor="#1f2937"
+              fgColor="#ffffff"
+              level="H"
               />
             </div>
 
             <div className="text-right">
               <Image
-                src="/signs/cto.png"
-                alt="CTO Signature"
-                width={150}
-                height={50}
-                className="mb-2 filter invert brightness-200"
+              src="/signs/cto.png"
+              alt="CTO Signature"
+              width={150}
+              height={50}
+              className="mb-2 filter invert brightness-200"
               />
               <p className="font-semibold">Swaraj Puppalwar</p>
               <p className="text-gray-400 text-sm">CTO, Lioran Group</p>
             </div>
-          </div>
+            </div>
         </div>
       </div>
 
