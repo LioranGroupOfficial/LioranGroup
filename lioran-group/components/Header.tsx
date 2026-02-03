@@ -14,7 +14,7 @@ export default function Header() {
             href="/"
             className="text-lg font-semibold tracking-tight bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent"
           >
-            Lioran Groups
+            Lioran Group
           </Link>
 
           {/* Menu Button */}
