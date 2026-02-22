@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 let isConnected = false;
 
-export const connectDB = async (): Promise<void> => {
+export const connectDB = async (dbName: string = "LioranGroup"): Promise<void> => {
   if (isConnected) return;
 
   try {
     await mongoose.connect(process.env.MONGO_URI as string, {
-      dbName: "LioranGroup",
+      dbName: dbName,
     });
 
     isConnected = true;
