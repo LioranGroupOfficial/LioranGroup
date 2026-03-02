@@ -117,16 +117,16 @@ export default function PageClient() {
           />
 
           <label className="mt-4 flex items-center gap-3 text-sm text-zinc-400">
-            <input
-              type="checkbox"
-              checked={form.updates}
-              onChange={(e) =>
-                setForm({ ...form, updates: e.target.checked })
-              }
-              className="accent-white"
-            />
-            Receive platform updates and early features
-          </label>
+  <input
+    type="checkbox"
+    checked={form.updates}
+    onChange={(e) =>
+      setForm({ ...form, updates: e.target.checked })
+    }
+    className="w-4 h-4 accent-emerald-500 bg-zinc-900 border border-zinc-600 rounded"
+  />
+  Receive platform updates and early features
+</label>
 
           <button
             disabled={loading}
