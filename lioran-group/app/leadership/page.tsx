@@ -103,6 +103,20 @@ const leaders: Leader[] = [
       instagram: "https://www.instagram.com/pranay_kumeriya_11/",
     },
   },
+  // CMO not co-founder
+  {
+    name: "Saiprasad Nalamwar",
+    roles: "Chief Marketing Officer",
+    tag: "cmo",
+    image: "/founders/saiprasad-f.jpeg",
+    description:
+      "Marketing strategist driving brand awareness and customer engagement.",
+    background: "Marketing and communications",
+    focus: "Brand strategy and customer acquisition",
+    socials: {
+      instagram: "https://www.instagram.com/sai.prasad.163/",
+    },
+  }
 ];
 
 /* -------------------- ICON MAP -------------------- */
