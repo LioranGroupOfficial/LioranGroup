@@ -66,7 +66,7 @@ const leaders: Leader[] = [
     tag: "cto",
     image: "/founders/swaraj-f.jpeg",
     description:
-      "Technology-driven builder focused on scalable systems and long-term innovation.",
+      "Technology-driven builder focused on scalable systems, software architecture, and long-term technological innovation.",
     background: "Full-stack engineering, systems design",
     focus: "Platform architecture, engineering culture",
     socials: {
@@ -77,46 +77,6 @@ const leaders: Leader[] = [
       website: "https://swarajpuppalwar.onrender.com",
     },
   },
-  {
-    name: "Shreyash Raipure",
-    roles: "Co-Founder, CEO & CFO",
-    tag: "ceo-cfo",
-    image: "/founders/shreyash-f.jpeg",
-    description:
-      "Strategic leader driving vision, finance, and long-term business growth.",
-    background: "Leadership, finance, and strategy",
-    focus: "Vision, capital allocation, partnerships",
-    socials: {
-      instagram: "https://www.instagram.com/shreyash_ak31/",
-    },
-  },
-  {
-    name: "Pranay Kumeriya",
-    roles: "Co-Founder & COO",
-    tag: "coo",
-    image: "/founders/pranay-f.jpeg",
-    description:
-      "Execution-focused operator ensuring smooth delivery and operational excellence.",
-    background: "Operations and execution",
-    focus: "Process optimization and delivery",
-    socials: {
-      instagram: "https://www.instagram.com/pranay_kumeriya_11/",
-    },
-  },
-  // CMO not co-founder
-  {
-    name: "Saiprasad Nalamwar",
-    roles: "Chief Marketing Officer",
-    tag: "cmo",
-    image: "/founders/saiprasad-f.jpeg",
-    description:
-      "Marketing strategist driving brand awareness and customer engagement.",
-    background: "Marketing and communications",
-    focus: "Brand strategy and customer acquisition",
-    socials: {
-      instagram: "https://www.instagram.com/sai.prasad.163/",
-    },
-  }
 ];
 
 /* -------------------- ICON MAP -------------------- */
@@ -163,6 +123,7 @@ export default function LeadershipPage() {
             {/* Content */}
             <div className="flex-1 text-center sm:text-left">
               <h2 className="text-xl font-semibold">{leader.name}</h2>
+
               <p className="text-sky-400 text-sm mt-1">
                 {leader.roles}
               </p>
@@ -185,6 +146,7 @@ export default function LeadershipPage() {
               <div className="flex justify-center sm:justify-start gap-5 mt-4">
                 {Object.entries(leader.socials).map(([key, value]) => {
                   if (!value) return null;
+
                   const Icon =
                     socialIconMap[key as keyof typeof socialIconMap];
 
@@ -201,8 +163,10 @@ export default function LeadershipPage() {
                   );
                 })}
               </div>
+
               {/* Divider */}
               <div className="w-full h-px bg-slate-800 my-4"></div>
+
               {/* View more */}
               <div className="flex justify-center sm:justify-start">
                 <Link
