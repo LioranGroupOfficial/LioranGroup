@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import {
+  PDFDocument,
+  rgb,
+  StandardFonts,
+  type PDFFont,
+  type RGB,
+} from "pdf-lib";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 import { QRCodeCanvas } from "qrcode.react";
@@ -17,486 +23,636 @@ function formatDate(value: string) {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 
+function formatStatus(status: string) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function getStatusMessage(status: string) {
+  if (status === "active") {
+    return "This certificate is active and can be verified as a valid issued record.";
+  }
+
+  if (status === "suspended") {
+    return "This certificate record is still viewable, but it is currently suspended and is not considered valid for active verification.";
+  }
+
+  return "This certificate record remains available for audit purposes, but it has been revoked and is no longer valid.";
+}
+
+function dataUrlToArrayBuffer(dataUrl: string): ArrayBuffer {
+  const base64 = dataUrl.split(",")[1];
+
+  if (!base64) {
+    throw new Error("Invalid image data URL.");
+  }
+
+  const binary = window.atob(base64);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return bytes.buffer;
+}
+
+async function loadImageAsArrayBuffer(src: string): Promise<ArrayBuffer> {
+  const response = await fetch(src, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to load image: ${src}`);
+  }
+
+  return response.arrayBuffer();
+}
+
 export default function CertificateViewer({ certificate }: Props) {
-  function formatStatus(status: string) {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  }
-
-  function getStatusMessage(status: string) {
-    if (status === "active") {
-      return "This certificate is active and can be verified as a valid issued record.";
-    }
-
-    if (status === "suspended") {
-      return "This certificate record is still viewable, but it is currently suspended and not considered valid for active verification.";
-    }
-
-    return "This certificate record remains available for audit purposes, but it has been revoked and is no longer valid.";
-  }
-
-  async function convertSignatureToWhite(src: string): Promise<ArrayBuffer> {
-    const img = new window.Image();
-    img.src = src;
-    await new Promise((resolve) => {
-      img.onload = () => resolve(null);
-    });
-
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) {
-      throw new Error("Canvas is not supported");
-    }
-
-    ctx.drawImage(img, 0, 0);
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-
-    for (let index = 0; index < data.length; index += 4) {
-      const red = data[index];
-      const green = data[index + 1];
-      const blue = data[index + 2];
-      const alpha = data[index + 3];
-
-      if (alpha > 0 && red < 80 && green < 80 && blue < 80) {
-        data[index] = 255;
-        data[index + 1] = 255;
-        data[index + 2] = 255;
-      }
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-
-    return new Promise((resolve) => {
-      canvas.toBlob(async (blob) => {
-        resolve(await blob!.arrayBuffer());
-      }, "image/png");
-    });
-  }
-
   async function generatePdf() {
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([842, 595]);
-    const { width, height } = page.getSize();
-    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+    try {
+      const pdfDoc = await PDFDocument.create();
 
-    const palette = {
-      background: rgb(0.08, 0.09, 0.11),
-      panel: rgb(0.14, 0.16, 0.2),
-      panelSoft: rgb(0.18, 0.2, 0.25),
-      border: rgb(0.61, 0.56, 0.46),
-      text: rgb(0.98, 0.98, 0.97),
-      textSoft: rgb(0.82, 0.83, 0.85),
-      accent: rgb(0.85, 0.76, 0.56),
-      accentSoft: rgb(0.73, 0.68, 0.59),
-      active: rgb(0.59, 0.84, 0.65),
-      suspended: rgb(0.94, 0.76, 0.34),
-      revoked: rgb(0.91, 0.51, 0.51),
-    };
+      /*
+       * A4-style landscape certificate.
+       */
+      const page = pdfDoc.addPage([842, 595]);
+      const { width, height } = page.getSize();
 
-    const statusColor =
-      certificate.status === "active"
-        ? palette.active
-        : certificate.status === "suspended"
-          ? palette.suspended
-          : palette.revoked;
+      const fontBold = await pdfDoc.embedFont(
+        StandardFonts.HelveticaBold,
+      );
 
-    const centerText = (
-      text: string,
-      y: number,
-      size: number,
-      font: typeof fontRegular,
-      color: ReturnType<typeof rgb>,
-    ) => {
-      const textWidth = font.widthOfTextAtSize(text, size);
-      page.drawText(text, {
-        x: (width - textWidth) / 2,
-        y,
-        size,
-        font,
-        color,
-      });
-    };
+      const fontRegular = await pdfDoc.embedFont(
+        StandardFonts.Helvetica,
+      );
 
-    const drawWrappedText = ({
-      text,
-      x,
-      y,
-      maxWidth,
-      size,
-      font,
-      color,
-      lineHeight,
-    }: {
-      text: string;
-      x: number;
-      y: number;
-      maxWidth: number;
-      size: number;
-      font: typeof fontRegular;
-      color: ReturnType<typeof rgb>;
-      lineHeight: number;
-    }) => {
-      const words = text.split(/\s+/);
-      const lines: string[] = [];
-      let line = "";
+      const fontOblique = await pdfDoc.embedFont(
+        StandardFonts.HelveticaOblique,
+      );
 
-      for (const word of words) {
-        const candidate = line ? `${line} ${word}` : word;
-        const candidateWidth = font.widthOfTextAtSize(candidate, size);
+      /*
+       * Light premium palette.
+       */
+      const palette = {
+        paper: rgb(0.98, 0.97, 0.94),
+        ink: rgb(0.15, 0.15, 0.18),
+        soft: rgb(0.36, 0.36, 0.4),
+        accent: rgb(0.67, 0.55, 0.32),
+        accentSoft: rgb(0.79, 0.71, 0.56),
+        panel: rgb(0.95, 0.93, 0.88),
+        panelSoft: rgb(0.975, 0.965, 0.935),
+        border: rgb(0.73, 0.65, 0.49),
+        active: rgb(0.34, 0.56, 0.37),
+        suspended: rgb(0.73, 0.52, 0.16),
+        revoked: rgb(0.68, 0.25, 0.25),
+      };
 
-        if (candidateWidth <= maxWidth) {
-          line = candidate;
-        } else {
-          if (line) {
-            lines.push(line);
-          }
-          line = word;
-        }
-      }
+      const statusColor =
+        certificate.status === "active"
+          ? palette.active
+          : certificate.status === "suspended"
+            ? palette.suspended
+            : palette.revoked;
 
-      if (line) {
-        lines.push(line);
-      }
+      const centerText = (
+        text: string,
+        y: number,
+        size: number,
+        font: PDFFont,
+        color: RGB,
+      ) => {
+        const textWidth = font.widthOfTextAtSize(text, size);
 
-      let cursorY = y;
-
-      for (const currentLine of lines) {
-        page.drawText(currentLine, {
-          x,
-          y: cursorY,
+        page.drawText(text, {
+          x: (width - textWidth) / 2,
+          y,
           size,
           font,
           color,
         });
-        cursorY -= lineHeight;
-      }
+      };
 
-      return cursorY;
-    };
-
-    const drawLabelValue = ({
-      label,
-      value,
-      x,
-      y,
-      width: blockWidth,
-      size = 12,
-      lineHeight = 16,
-    }: {
-      label: string;
-      value: string;
-      x: number;
-      y: number;
-      width: number;
-      size?: number;
-      lineHeight?: number;
-    }) => {
-      page.drawText(label.toUpperCase(), {
+      const drawWrappedText = ({
+        text,
         x,
         y,
+        maxWidth,
+        size,
+        font,
+        color,
+        lineHeight,
+        maxLines,
+      }: {
+        text: string;
+        x: number;
+        y: number;
+        maxWidth: number;
+        size: number;
+        font: PDFFont;
+        color: RGB;
+        lineHeight: number;
+        maxLines?: number;
+      }) => {
+        const words = text.trim().split(/\s+/);
+        const lines: string[] = [];
+
+        let line = "";
+
+        for (const word of words) {
+          const candidate = line ? `${line} ${word}` : word;
+          const candidateWidth = font.widthOfTextAtSize(
+            candidate,
+            size,
+          );
+
+          if (candidateWidth <= maxWidth) {
+            line = candidate;
+            continue;
+          }
+
+          if (line) {
+            lines.push(line);
+          }
+
+          line = word;
+        }
+
+        if (line) {
+          lines.push(line);
+        }
+
+        let visibleLines = lines;
+
+        if (maxLines && lines.length > maxLines) {
+          visibleLines = lines.slice(0, maxLines);
+
+          const lastLineIndex = visibleLines.length - 1;
+          let lastLine = visibleLines[lastLineIndex];
+
+          while (
+            font.widthOfTextAtSize(`${lastLine}...`, size) >
+              maxWidth &&
+            lastLine.length > 0
+          ) {
+            lastLine = lastLine.slice(0, -1);
+          }
+
+          visibleLines[lastLineIndex] = `${lastLine.trim()}...`;
+        }
+
+        let cursorY = y;
+
+        for (const currentLine of visibleLines) {
+          page.drawText(currentLine, {
+            x,
+            y: cursorY,
+            size,
+            font,
+            color,
+          });
+
+          cursorY -= lineHeight;
+        }
+
+        return cursorY;
+      };
+
+      const drawLabelValue = ({
+        label,
+        value,
+        x,
+        y,
+        width: blockWidth,
+        size = 11,
+        lineHeight = 14,
+        maxLines,
+      }: {
+        label: string;
+        value: string;
+        x: number;
+        y: number;
+        width: number;
+        size?: number;
+        lineHeight?: number;
+        maxLines?: number;
+      }) => {
+        page.drawText(label.toUpperCase(), {
+          x,
+          y,
+          size: 9,
+          font: fontBold,
+          color: palette.accent,
+        });
+
+        return drawWrappedText({
+          text: value,
+          x,
+          y: y - 19,
+          maxWidth: blockWidth,
+          size,
+          font: fontRegular,
+          color: palette.ink,
+          lineHeight,
+          maxLines,
+        });
+      };
+
+      /*
+       * ONE FILLED OUTER BOUNDARY
+       *
+       * No extra nested page borders.
+       */
+      const boundaryMargin = 20;
+
+      page.drawRectangle({
+        x: boundaryMargin,
+        y: boundaryMargin,
+        width: width - boundaryMargin * 2,
+        height: height - boundaryMargin * 2,
+        color: palette.panel,
+        borderWidth: 1.5,
+        borderColor: palette.border,
+      });
+
+      /*
+       * Certificate heading.
+       */
+      centerText(
+        "Certificate of Achievement",
+        height - 66,
+        29,
+        fontBold,
+        palette.ink,
+      );
+
+      centerText(
+        "This certificate is proudly presented to",
+        height - 99,
+        14,
+        fontRegular,
+        palette.soft,
+      );
+
+      centerText(
+        certificate.name,
+        height - 147,
+        29,
+        fontBold,
+        palette.ink,
+      );
+
+      centerText(
+        certificate.role,
+        height - 181,
+        15.5,
+        fontOblique,
+        palette.accent,
+      );
+
+      page.drawLine({
+        start: {
+          x: 228,
+          y: height - 203,
+        },
+        end: {
+          x: width - 228,
+          y: height - 203,
+        },
+        thickness: 1,
+        color: palette.border,
+      });
+
+      /*
+       * LARGE DETAILS SECTION
+       *
+       * Height:
+       * 352 - 183 = 169 points
+       *
+       * This is significantly taller than the previous version.
+       */
+      const detailsTop = 352;
+      const detailsBottom = 183;
+      const detailsHeight = detailsTop - detailsBottom;
+
+      const leftX = 72;
+      const leftWidth = 410;
+
+      const rightX = 518;
+      const rightWidth = 220;
+
+      page.drawRectangle({
+        x: leftX - 12,
+        y: detailsBottom,
+        width: leftWidth + 24,
+        height: detailsHeight,
+        color: palette.panelSoft,
+        borderWidth: 0.8,
+        borderColor: palette.accentSoft,
+      });
+
+      page.drawRectangle({
+        x: rightX - 12,
+        y: detailsBottom,
+        width: rightWidth + 24,
+        height: detailsHeight,
+        color: palette.panelSoft,
+        borderWidth: 0.8,
+        borderColor: palette.accentSoft,
+      });
+
+      /*
+       * Left details.
+       */
+      let leftCursorY = drawLabelValue({
+        label: "Contribution",
+        value: certificate.contribution,
+        x: leftX,
+        y: detailsTop - 19,
+        width: leftWidth,
+        size: 11,
+        lineHeight: 14,
+        maxLines: 2,
+      });
+
+      leftCursorY -= 13;
+
+      drawLabelValue({
+        label: "Description",
+        value: certificate.description,
+        x: leftX,
+        y: leftCursorY,
+        width: leftWidth,
+        size: 10.5,
+        lineHeight: 13.5,
+        maxLines: 5,
+      });
+
+      /*
+       * Right details.
+       */
+      let rightCursorY = drawLabelValue({
+        label: "Certificate ID",
+        value: certificate.certificateId,
+        x: rightX,
+        y: detailsTop - 19,
+        width: rightWidth,
+        size: 10.5,
+        lineHeight: 14,
+        maxLines: 1,
+      });
+
+      rightCursorY -= 10;
+
+      rightCursorY = drawLabelValue({
+        label: "Duration",
+        value: `${certificate.duration} | ${formatDate(
+          certificate.startDate,
+        )} to ${formatDate(certificate.endDate)}`,
+        x: rightX,
+        y: rightCursorY,
+        width: rightWidth,
+        size: 10,
+        lineHeight: 13,
+        maxLines: 3,
+      });
+
+      rightCursorY -= 10;
+
+      rightCursorY = drawLabelValue({
+        label: "Issued by",
+        value: certificate.issuedBy,
+        x: rightX,
+        y: rightCursorY,
+        width: rightWidth,
+        size: 10,
+        lineHeight: 13,
+        maxLines: 2,
+      });
+
+      rightCursorY -= 9;
+
+      /*
+       * Status label and badge.
+       */
+      page.drawText("STATUS", {
+        x: rightX,
+        y: rightCursorY,
         size: 9,
         font: fontBold,
         color: palette.accent,
       });
 
-      return drawWrappedText({
-        text: value,
-        x,
-        y: y - 20,
-        maxWidth: blockWidth,
-        size,
-        font: fontRegular,
-        color: palette.text,
-        lineHeight,
+      const statusText = formatStatus(
+        certificate.status,
+      ).toUpperCase();
+
+      const statusTextWidth = fontBold.widthOfTextAtSize(
+        statusText,
+        9.5,
+      );
+
+      const statusBadgeWidth = Math.max(
+        94,
+        statusTextWidth + 24,
+      );
+
+      page.drawRectangle({
+        x: rightX,
+        y: rightCursorY - 24,
+        width: statusBadgeWidth,
+        height: 19,
+        color: statusColor,
       });
-    };
 
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width,
-      height,
-      color: palette.background,
-    });
+      page.drawText(statusText, {
+        x:
+          rightX +
+          (statusBadgeWidth - statusTextWidth) / 2,
+        y: rightCursorY - 18,
+        size: 9.5,
+        font: fontBold,
+        color: palette.paper,
+      });
 
-    page.drawRectangle({
-      x: 18,
-      y: 18,
-      width: width - 36,
-      height: height - 36,
-      borderWidth: 1.2,
-      borderColor: palette.border,
-      color: palette.background,
-    });
+      /*
+       * Generate QR from real verification URL.
+       */
+      const qrDataUrl = await QRCode.toDataURL(
+        certificate.verificationUrl,
+        {
+          width: 180,
+          margin: 1,
+          errorCorrectionLevel: "H",
+          color: {
+            dark: "#26262e",
+            light: "#f8f5ed",
+          },
+        },
+      );
 
-    page.drawRectangle({
-      x: 32,
-      y: 32,
-      width: width - 64,
-      height: height - 64,
-      borderWidth: 0.6,
-      borderColor: palette.accentSoft,
-    });
+      const qrImageBytes = dataUrlToArrayBuffer(qrDataUrl);
+      const qrImage = await pdfDoc.embedPng(qrImageBytes);
 
-    const contentX = 54;
-    const contentY = 52;
-    const contentWidth = width - 108;
-    const contentHeight = height - 104;
+      /*
+       * Load original dark signature.
+       */
+      const signatureBytes = await loadImageAsArrayBuffer(
+        "/signs/cto.png",
+      );
 
-    page.drawRectangle({
-      x: contentX,
-      y: contentY,
-      width: contentWidth,
-      height: contentHeight,
-      color: palette.panel,
-      borderWidth: 1,
-      borderColor: rgb(0.24, 0.26, 0.31),
-    });
+      const signatureImage = await pdfDoc.embedPng(
+        signatureBytes,
+      );
 
-    centerText("Certificate of Achievement", height - 90, 29, fontBold, palette.text);
-    centerText(
-      "This certificate is proudly presented to",
-      height - 126,
-      15,
-      fontRegular,
-      palette.textSoft,
-    );
-    centerText(certificate.name, height - 188, 31, fontBold, palette.text);
-    centerText(certificate.role, height - 228, 16, fontOblique, palette.accent);
+      /*
+       * Footer boxes.
+       */
+      const footerY = 43;
+      const footerHeight = 103;
 
-    page.drawLine({
-      start: { x: 230, y: height - 254 },
-      end: { x: width - 230, y: height - 254 },
-      thickness: 1,
-      color: palette.border,
-    });
+      const qrBoxX = 88;
+      const qrBoxWidth = 272;
 
-    const detailsTop = height - 308;
-    const detailsBottom = 182;
-    const panelHeight = detailsTop - detailsBottom;
-    const leftX = 82;
-    const leftWidth = 392;
-    const rightX = 508;
-    const rightWidth = 212;
+      const signatureBoxWidth = 264;
+      const signatureBoxX =
+        width - 88 - signatureBoxWidth;
 
-    page.drawRectangle({
-      x: leftX - 14,
-      y: detailsBottom,
-      width: leftWidth + 28,
-      height: panelHeight,
-      color: palette.panelSoft,
-      borderWidth: 0.8,
-      borderColor: rgb(0.27, 0.29, 0.34),
-    });
+      page.drawRectangle({
+        x: qrBoxX,
+        y: footerY,
+        width: qrBoxWidth,
+        height: footerHeight,
+        color: palette.panelSoft,
+        borderWidth: 0.8,
+        borderColor: palette.accentSoft,
+      });
 
-    page.drawRectangle({
-      x: rightX - 14,
-      y: detailsBottom,
-      width: rightWidth + 28,
-      height: panelHeight,
-      color: palette.panelSoft,
-      borderWidth: 0.8,
-      borderColor: rgb(0.27, 0.29, 0.34),
-    });
+      page.drawRectangle({
+        x: signatureBoxX,
+        y: footerY,
+        width: signatureBoxWidth,
+        height: footerHeight,
+        color: palette.panelSoft,
+        borderWidth: 0.8,
+        borderColor: palette.accentSoft,
+      });
 
-    let leftCursorY = drawLabelValue({
-      label: "Contribution",
-      value: certificate.contribution,
-      x: leftX,
-      y: detailsTop - 8,
-      width: leftWidth,
-      size: 11,
-      lineHeight: 15,
-    });
+      /*
+       * QR section.
+       */
+      page.drawImage(qrImage, {
+        x: qrBoxX + 14,
+        y: footerY + 16,
+        width: 72,
+        height: 72,
+      });
 
-    leftCursorY -= 10;
+      page.drawText("Verify authenticity", {
+        x: qrBoxX + 100,
+        y: footerY + 67,
+        size: 11,
+        font: fontBold,
+        color: palette.accent,
+      });
 
-    drawLabelValue({
-      label: "Description",
-      value: certificate.description,
-      x: leftX,
-      y: leftCursorY,
-      width: leftWidth,
-      size: 11,
-      lineHeight: 14,
-    });
+      page.drawText("Scan to open the official", {
+        x: qrBoxX + 100,
+        y: footerY + 47,
+        size: 9.7,
+        font: fontRegular,
+        color: palette.soft,
+      });
 
-    let rightCursorY = drawLabelValue({
-      label: "Certificate ID",
-      value: certificate.certificateId,
-      x: rightX,
-      y: detailsTop - 8,
-      width: rightWidth,
-      size: 11,
-      lineHeight: 15,
-    });
+      page.drawText("certificate verification page", {
+        x: qrBoxX + 100,
+        y: footerY + 32,
+        size: 9.7,
+        font: fontRegular,
+        color: palette.soft,
+      });
 
-    rightCursorY -= 8;
+      page.drawText("on Lioran Group.", {
+        x: qrBoxX + 100,
+        y: footerY + 17,
+        size: 9.7,
+        font: fontRegular,
+        color: palette.soft,
+      });
 
-    rightCursorY = drawLabelValue({
-      label: "Duration",
-      value: `${certificate.duration} | ${formatDate(certificate.startDate)} to ${formatDate(certificate.endDate)}`,
-      x: rightX,
-      y: rightCursorY,
-      width: rightWidth,
-      size: 10.5,
-      lineHeight: 14,
-    });
+      /*
+       * Signature section.
+       */
+      page.drawImage(signatureImage, {
+        x: signatureBoxX + 18,
+        y: footerY + 58,
+        width: 138,
+        height: 34,
+      });
 
-    rightCursorY -= 8;
+      page.drawText("Swaraj Puppalwar", {
+        x: signatureBoxX + 18,
+        y: footerY + 42,
+        size: 11.5,
+        font: fontBold,
+        color: palette.ink,
+      });
 
-    rightCursorY = drawLabelValue({
-      label: "Issued by",
-      value: certificate.issuedBy,
-      x: rightX,
-      y: rightCursorY,
-      width: rightWidth,
-      size: 10.5,
-      lineHeight: 14,
-    });
+      page.drawText("CTO, Lioran Group", {
+        x: signatureBoxX + 18,
+        y: footerY + 26,
+        size: 10.2,
+        font: fontRegular,
+        color: palette.soft,
+      });
 
-    rightCursorY -= 8;
+      page.drawText(
+        `Issued on ${formatDate(certificate.issueDate)}`,
+        {
+          x: signatureBoxX + 18,
+          y: footerY + 11,
+          size: 9.3,
+          font: fontRegular,
+          color: palette.accent,
+        },
+      );
 
-    page.drawText("STATUS", {
-      x: rightX,
-      y: rightCursorY,
-      size: 9,
-      font: fontBold,
-      color: palette.accent,
-    });
+      /*
+       * PDF metadata.
+       */
+      pdfDoc.setTitle(
+        `Certificate of Achievement - ${certificate.name}`,
+      );
 
-    page.drawRectangle({
-      x: rightX,
-      y: rightCursorY - 22,
-      width: 118,
-      height: 20,
-      color: statusColor,
-    });
+      pdfDoc.setSubject(
+        `Certificate ${certificate.certificateId} issued by ${certificate.issuedBy}`,
+      );
 
-    page.drawText(formatStatus(certificate.status).toUpperCase(), {
-      x: rightX + 12,
-      y: rightCursorY - 16,
-      size: 10,
-      font: fontBold,
-      color: palette.background,
-    });
+      pdfDoc.setAuthor("Lioran Group");
+      pdfDoc.setCreator("Lioran Group Certificate System");
+      pdfDoc.setProducer("Lioran Group");
 
-    const footerY = 34;
-    const qrBoxX = 96;
-    const qrBoxWidth = 246;
-    const qrBoxHeight = 92;
-    const signatureBoxWidth = 248;
-    const signatureBoxHeight = 92;
-    const signatureBoxX = width - 96 - signatureBoxWidth;
+      const pdfBytes = await pdfDoc.save();
 
-    const qrDataUrl = await QRCode.toDataURL(certificate.verificationUrl, {
-      width: 160,
-      margin: 1,
-      color: { dark: "#ffffff", light: "#1f2937" },
-    });
+      const blob = new Blob([new Uint8Array(pdfBytes)], {
+        type: "application/pdf",
+      });
 
-    const qrImageBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());
-    const qrImage = await pdfDoc.embedPng(qrImageBytes);
-    const signatureBytes = await convertSignatureToWhite("/signs/cto.png");
-    const signatureImage = await pdfDoc.embedPng(signatureBytes);
+      saveAs(
+        blob,
+        `certificate-${certificate.certificateId}.pdf`,
+      );
+    } catch (error) {
+      console.error("Failed to generate certificate PDF:", error);
 
-    page.drawRectangle({
-      x: qrBoxX,
-      y: footerY,
-      width: qrBoxWidth,
-      height: qrBoxHeight,
-      color: palette.panelSoft,
-      borderWidth: 0.8,
-      borderColor: rgb(0.27, 0.29, 0.34),
-    });
-
-    page.drawRectangle({
-      x: signatureBoxX,
-      y: footerY,
-      width: signatureBoxWidth,
-      height: signatureBoxHeight,
-      color: palette.panelSoft,
-      borderWidth: 0.8,
-      borderColor: rgb(0.27, 0.29, 0.34),
-    });
-
-    page.drawImage(qrImage, {
-      x: qrBoxX + 14,
-      y: footerY + 12,
-      width: 68,
-      height: 68,
-    });
-
-    page.drawText("Verify authenticity", {
-      x: qrBoxX + 96,
-      y: footerY + 58,
-      size: 11,
-      font: fontBold,
-      color: palette.accent,
-    });
-
-    page.drawText("Scan to open the official", {
-      x: qrBoxX + 96,
-      y: footerY + 39,
-      size: 10,
-      font: fontRegular,
-      color: palette.textSoft,
-    });
-
-    page.drawText("verification page on Lioran Group.", {
-      x: qrBoxX + 96,
-      y: footerY + 24,
-      size: 10,
-      font: fontRegular,
-      color: palette.textSoft,
-    });
-
-    page.drawImage(signatureImage, {
-      x: signatureBoxX + 20,
-      y: footerY + 50,
-      width: 132,
-      height: 34,
-    });
-
-    page.drawText("Swaraj Puppalwar", {
-      x: signatureBoxX + 20,
-      y: footerY + 34,
-      size: 11.5,
-      font: fontBold,
-      color: palette.text,
-    });
-
-    page.drawText("CTO, Lioran Group", {
-      x: signatureBoxX + 20,
-      y: footerY + 18,
-      size: 10.5,
-      font: fontRegular,
-      color: palette.textSoft,
-    });
-
-    page.drawText(`Issued on ${formatDate(certificate.issueDate)}`, {
-      x: signatureBoxX + 20,
-      y: footerY + 5,
-      size: 9.5,
-      font: fontRegular,
-      color: palette.accentSoft,
-    });
-
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([new Uint8Array(pdfBytes)], {
-      type: "application/pdf",
-    });
-
-    saveAs(blob, `certificate-${certificate.certificateId}.pdf`);
+      window.alert(
+        "The certificate PDF could not be generated. Please try again.",
+      );
+    }
   }
 
   const isVerified = certificate.status === "active";
@@ -511,21 +667,31 @@ export default function CertificateViewer({ certificate }: Props) {
         padding: "48px 16px 80px",
       }}
     >
-      <div className="page-shell page-grid" style={{ padding: 0 }}>
+      <div
+        className="page-shell page-grid"
+        style={{ padding: 0 }}
+      >
         <section className="page-intro">
           <span className="eyebrow">
-            {isVerified ? "Verified Certificate" : "Certificate Status"}
+            {isVerified
+              ? "Verified Certificate"
+              : "Certificate Status"}
           </span>
+
           <h1>{certificate.name}</h1>
+
           <p>
-            {certificate.role} for {certificate.organization}. Certificate ID{" "}
-            {certificate.certificateId} is currently{" "}
+            {certificate.role} for {certificate.organization}.
+            Certificate ID {certificate.certificateId} is
+            currently{" "}
             <strong style={{ textTransform: "capitalize" }}>
               {formatStatus(certificate.status)}
             </strong>
             .
           </p>
+
           <p style={{ marginTop: 0 }}>{statusMessage}</p>
+
           <div className="button-row">
             <button
               type="button"
@@ -534,7 +700,11 @@ export default function CertificateViewer({ certificate }: Props) {
             >
               Download PDF
             </button>
-            <Link href={certificate.verificationUrl} className="button-secondary">
+
+            <Link
+              href={certificate.verificationUrl}
+              className="button-secondary"
+            >
               Verify Link
             </Link>
           </div>
@@ -545,15 +715,18 @@ export default function CertificateViewer({ certificate }: Props) {
           style={{
             padding: 0,
             overflow: "hidden",
-            background:
-              "linear-gradient(135deg, rgba(34,40,49,0.96), rgba(57,62,70,0.92))",
+            background: "#f8f5ed",
+            border: "1px solid #948979",
+            borderRadius: 4,
+            color: "#222831",
           }}
         >
           <div
             style={{
               position: "relative",
-              padding: "48px 40px",
+              padding: "52px 42px",
               overflow: "hidden",
+              background: "#eee9dd",
             }}
           >
             <div
@@ -571,63 +744,205 @@ export default function CertificateViewer({ certificate }: Props) {
                 alt="Lioran watermark"
                 width={420}
                 height={420}
-                style={{ opacity: 0.08 }}
+                style={{
+                  opacity: 0.045,
+                  filter: "grayscale(1)",
+                }}
               />
             </div>
 
-            <div style={{ position: "relative", display: "grid", gap: 32 }}>
-              <div style={{ textAlign: "center", display: "grid", gap: 10 }}>
-                <h2 style={{ margin: 0, fontSize: "clamp(2rem, 5vw, 3rem)" }}>
+            <div
+              style={{
+                position: "relative",
+                display: "grid",
+                gap: 32,
+              }}
+            >
+              <div
+                style={{
+                  textAlign: "center",
+                  display: "grid",
+                  gap: 10,
+                }}
+              >
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: "clamp(2rem, 5vw, 3rem)",
+                    color: "#222831",
+                  }}
+                >
                   Certificate of Achievement
                 </h2>
-                <p className="text-soft">
+
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#5c5c66",
+                  }}
+                >
                   This certificate is proudly presented to
                 </p>
               </div>
 
-              <div style={{ textAlign: "center", display: "grid", gap: 8 }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  display: "grid",
+                  gap: 8,
+                }}
+              >
                 <p
                   style={{
                     margin: 0,
                     fontSize: "clamp(2rem, 4vw, 2.75rem)",
                     fontWeight: 800,
+                    color: "#222831",
                   }}
                 >
                   {certificate.name}
                 </p>
-                <p style={{ margin: 0, color: "var(--text-soft)", fontSize: "1.1rem" }}>
+
+                <p
+                  style={{
+                    margin: 0,
+                    color: "#948979",
+                    fontSize: "1.1rem",
+                    fontStyle: "italic",
+                  }}
+                >
                   {certificate.role}
                 </p>
               </div>
 
-              <div className="card-grid two-column">
-                <article className="card">
-                  <p style={{ margin: 0 }}>
-                    <strong>Contribution</strong>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "repeat(auto-fit, minmax(260px, 1fr))",
+                  gap: 16,
+                }}
+              >
+                <article
+                  style={{
+                    minHeight: 140,
+                    padding: 22,
+                    background: "#f8f5ed",
+                    border: "1px solid #c9bca4",
+                    borderRadius: 4,
+                    display: "grid",
+                    alignContent: "start",
+                    gap: 10,
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#948979",
+                      fontSize: 12,
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Contribution
                   </p>
-                  <p style={{ margin: 0 }}>{certificate.contribution}</p>
+
+                  <p style={{ margin: 0 }}>
+                    {certificate.contribution}
+                  </p>
                 </article>
-                <article className="card">
-                  <p style={{ margin: 0 }}>
-                    <strong>Description</strong>
+
+                <article
+                  style={{
+                    minHeight: 140,
+                    padding: 22,
+                    background: "#f8f5ed",
+                    border: "1px solid #c9bca4",
+                    borderRadius: 4,
+                    display: "grid",
+                    alignContent: "start",
+                    gap: 10,
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#948979",
+                      fontSize: 12,
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Description
                   </p>
-                  <p style={{ margin: 0 }}>{certificate.description}</p>
+
+                  <p style={{ margin: 0 }}>
+                    {certificate.description}
+                  </p>
                 </article>
-                <article className="card">
-                  <p style={{ margin: 0 }}>
-                    <strong>Duration</strong>
+
+                <article
+                  style={{
+                    minHeight: 120,
+                    padding: 22,
+                    background: "#f8f5ed",
+                    border: "1px solid #c9bca4",
+                    borderRadius: 4,
+                    display: "grid",
+                    alignContent: "start",
+                    gap: 10,
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#948979",
+                      fontSize: 12,
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Duration
                   </p>
+
                   <p style={{ margin: 0 }}>
-                    {certificate.duration} from {formatDate(certificate.startDate)} to{" "}
+                    {certificate.duration} from{" "}
+                    {formatDate(certificate.startDate)} to{" "}
                     {formatDate(certificate.endDate)}
                   </p>
                 </article>
-                <article className="card">
-                  <p style={{ margin: 0 }}>
-                    <strong>Issued</strong>
+
+                <article
+                  style={{
+                    minHeight: 120,
+                    padding: 22,
+                    background: "#f8f5ed",
+                    border: "1px solid #c9bca4",
+                    borderRadius: 4,
+                    display: "grid",
+                    alignContent: "start",
+                    gap: 10,
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#948979",
+                      fontSize: 12,
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Issued
                   </p>
+
                   <p style={{ margin: 0 }}>
-                    {certificate.issuedBy} on {formatDate(certificate.issueDate)}
+                    {certificate.issuedBy} on{" "}
+                    {formatDate(certificate.issueDate)}
                   </p>
                 </article>
               </div>
@@ -641,15 +956,30 @@ export default function CertificateViewer({ certificate }: Props) {
                   alignItems: "flex-end",
                 }}
               >
-                <div className="card" style={{ gap: 14 }}>
-                  <p style={{ margin: 0 }}>
-                    <strong>Verification QR</strong>
+                <div
+                  style={{
+                    padding: 20,
+                    background: "#f8f5ed",
+                    border: "1px solid #c9bca4",
+                    borderRadius: 4,
+                    display: "grid",
+                    gap: 14,
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 700,
+                    }}
+                  >
+                    Verification QR
                   </p>
+
                   <QRCodeCanvas
                     value={certificate.verificationUrl}
                     size={160}
-                    bgColor="#222831"
-                    fgColor="#f9fafb"
+                    bgColor="#f8f5ed"
+                    fgColor="#222831"
                     level="H"
                   />
                 </div>
@@ -660,11 +990,39 @@ export default function CertificateViewer({ certificate }: Props) {
                     alt="CTO signature"
                     width={160}
                     height={56}
-                    style={{ filter: "invert(1) brightness(1.5)" }}
+                    style={{
+                      objectFit: "contain",
+                    }}
                   />
-                  <p style={{ margin: 0, fontWeight: 700 }}>Swaraj Puppalwar</p>
-                  <p style={{ margin: 0, color: "var(--text-muted)" }}>
+
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 700,
+                      color: "#222831",
+                    }}
+                  >
+                    Swaraj Puppalwar
+                  </p>
+
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#5c5c66",
+                    }}
+                  >
                     CTO, Lioran Group
+                  </p>
+
+                  <p
+                    style={{
+                      margin: "4px 0 0",
+                      color: "#948979",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    Issued on{" "}
+                    {formatDate(certificate.issueDate)}
                   </p>
                 </div>
               </div>
