@@ -106,6 +106,18 @@ export async function createCertificate(input: CertificateInput) {
   return serializeCertificate(certificate);
 }
 
+export async function getCertificateById(certificateId: string) {
+  const certificate = await Certificate.findOne({ certificateId }).lean();
+  return certificate ? serializeCertificate(certificate as CertificateSource) : null;
+}
+
+export async function listCertificates() {
+  const certificates = await Certificate.find({}).sort({ createdAt: -1 }).lean();
+  return certificates.map((certificate) =>
+    serializeCertificate(certificate as CertificateSource),
+  );
+}
+
 export async function updateCertificateRecord(
   certificateId: string,
   updates: Partial<CertificateInput>,
