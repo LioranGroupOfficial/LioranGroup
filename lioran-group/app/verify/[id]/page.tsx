@@ -9,6 +9,22 @@ interface Certificate {
   status: string;
 }
 
+function formatStatus(status: string) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function getStatusMessage(status: string) {
+  if (status === "active") {
+    return "This certificate is valid and currently verified.";
+  }
+
+  if (status === "suspended") {
+    return "This certificate record exists, but it is currently suspended and should not be treated as active.";
+  }
+
+  return "This certificate record exists for reference, but it has been revoked and is not valid.";
+}
+
 async function getCertificate(id: string): Promise<Certificate | null> {
   await connectDB();
   return getCertificateById(id);
@@ -46,8 +62,9 @@ export default async function VerifyCertificatePage({
               <strong>Role:</strong> {certificate.role}
             </p>
             <p style={{ margin: 0 }}>
-              <strong>Status:</strong> {certificate.status}
+              <strong>Status:</strong> {formatStatus(certificate.status)}
             </p>
+            <p style={{ margin: 0 }}>{getStatusMessage(certificate.status)}</p>
             <div className="button-row" style={{ justifyContent: "center" }}>
               <Link
                 href={`/certificate/view/${certificate.certificateId}`}

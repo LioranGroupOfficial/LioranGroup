@@ -21,6 +21,22 @@ function formatDate(value: string) {
 }
 
 export default function CertificateViewer({ certificate }: Props) {
+  function formatStatus(status: string) {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  function getStatusMessage(status: string) {
+    if (status === "active") {
+      return "This certificate is active and can be verified as a valid issued record.";
+    }
+
+    if (status === "suspended") {
+      return "This certificate record is still viewable, but it is currently suspended and not considered valid for active verification.";
+    }
+
+    return "This certificate record remains available for audit purposes, but it has been revoked and is no longer valid.";
+  }
+
   async function convertSignatureToWhite(src: string): Promise<ArrayBuffer> {
     const img = new window.Image();
     img.src = src;
@@ -70,69 +86,283 @@ export default function CertificateViewer({ certificate }: Props) {
     const { width, height } = page.getSize();
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+
+    const palette = {
+      background: rgb(0.08, 0.09, 0.11),
+      panel: rgb(0.12, 0.14, 0.17),
+      panelSoft: rgb(0.16, 0.18, 0.22),
+      border: rgb(0.61, 0.56, 0.46),
+      text: rgb(0.98, 0.98, 0.97),
+      textSoft: rgb(0.82, 0.83, 0.85),
+      accent: rgb(0.85, 0.76, 0.56),
+      accentSoft: rgb(0.73, 0.68, 0.59),
+      active: rgb(0.59, 0.84, 0.65),
+      suspended: rgb(0.94, 0.76, 0.34),
+      revoked: rgb(0.91, 0.51, 0.51),
+    };
+
+    const statusColor =
+      certificate.status === "active"
+        ? palette.active
+        : certificate.status === "suspended"
+          ? palette.suspended
+          : palette.revoked;
+
+    const centerText = (
+      text: string,
+      y: number,
+      size: number,
+      font: typeof fontRegular,
+      color: ReturnType<typeof rgb>,
+    ) => {
+      const textWidth = font.widthOfTextAtSize(text, size);
+      page.drawText(text, {
+        x: (width - textWidth) / 2,
+        y,
+        size,
+        font,
+        color,
+      });
+    };
+
+    const drawWrappedText = ({
+      text,
+      x,
+      y,
+      maxWidth,
+      size,
+      font,
+      color,
+      lineHeight,
+    }: {
+      text: string;
+      x: number;
+      y: number;
+      maxWidth: number;
+      size: number;
+      font: typeof fontRegular;
+      color: ReturnType<typeof rgb>;
+      lineHeight: number;
+    }) => {
+      const words = text.split(/\s+/);
+      const lines: string[] = [];
+      let line = "";
+
+      for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word;
+        const candidateWidth = font.widthOfTextAtSize(candidate, size);
+
+        if (candidateWidth <= maxWidth) {
+          line = candidate;
+        } else {
+          if (line) {
+            lines.push(line);
+          }
+          line = word;
+        }
+      }
+
+      if (line) {
+        lines.push(line);
+      }
+
+      let cursorY = y;
+
+      for (const currentLine of lines) {
+        page.drawText(currentLine, {
+          x,
+          y: cursorY,
+          size,
+          font,
+          color,
+        });
+        cursorY -= lineHeight;
+      }
+
+      return cursorY;
+    };
+
+    const drawLabelValue = ({
+      label,
+      value,
+      x,
+      y,
+      width: blockWidth,
+    }: {
+      label: string;
+      value: string;
+      x: number;
+      y: number;
+      width: number;
+    }) => {
+      page.drawText(label.toUpperCase(), {
+        x,
+        y,
+        size: 9,
+        font: fontBold,
+        color: palette.accent,
+      });
+
+      return drawWrappedText({
+        text: value,
+        x,
+        y: y - 18,
+        maxWidth: blockWidth,
+        size: 12,
+        font: fontRegular,
+        color: palette.text,
+        lineHeight: 16,
+      });
+    };
 
     page.drawRectangle({
       x: 0,
       y: 0,
       width,
       height,
-      color: rgb(0.05, 0.05, 0.05),
+      color: palette.background,
     });
 
-    page.drawText("Certificate of Achievement", {
-      x: width / 2 - 200,
-      y: height - 100,
-      size: 30,
+    page.drawRectangle({
+      x: 20,
+      y: 20,
+      width: width - 40,
+      height: height - 40,
+      borderWidth: 1.2,
+      borderColor: palette.border,
+      color: palette.background,
+    });
+
+    page.drawRectangle({
+      x: 34,
+      y: 34,
+      width: width - 68,
+      height: height - 68,
+      borderWidth: 0.6,
+      borderColor: palette.accentSoft,
+    });
+
+    page.drawRectangle({
+      x: 56,
+      y: 70,
+      width: width - 112,
+      height: height - 140,
+      color: palette.panel,
+      borderWidth: 1,
+      borderColor: rgb(0.24, 0.26, 0.31),
+    });
+
+    centerText("Certificate of Achievement", height - 92, 29, fontBold, palette.text);
+    centerText("This certificate is proudly presented to", height - 124, 15, fontRegular, palette.textSoft);
+    centerText(certificate.name, height - 174, 31, fontBold, palette.text);
+    centerText(certificate.role, height - 207, 16, fontOblique, palette.accent);
+
+    page.drawLine({
+      start: { x: 248, y: height - 222 },
+      end: { x: width - 248, y: height - 222 },
+      thickness: 1,
+      color: palette.border,
+    });
+
+    const descriptionTop = 324;
+    const leftX = 86;
+    const leftWidth = 390;
+    const rightX = 510;
+    const rightWidth = 245;
+
+    page.drawRectangle({
+      x: leftX - 18,
+      y: 146,
+      width: leftWidth + 36,
+      height: 178,
+      color: palette.panelSoft,
+      borderWidth: 0.8,
+      borderColor: rgb(0.27, 0.29, 0.34),
+    });
+
+    page.drawRectangle({
+      x: rightX - 18,
+      y: 146,
+      width: rightWidth + 36,
+      height: 178,
+      color: palette.panelSoft,
+      borderWidth: 0.8,
+      borderColor: rgb(0.27, 0.29, 0.34),
+    });
+
+    let leftCursorY = drawLabelValue({
+      label: "Contribution",
+      value: certificate.contribution,
+      x: leftX,
+      y: descriptionTop,
+      width: leftWidth,
+    });
+
+    leftCursorY -= 10;
+
+    drawLabelValue({
+      label: "Description",
+      value: certificate.description,
+      x: leftX,
+      y: leftCursorY,
+      width: leftWidth,
+    });
+
+    let rightCursorY = drawLabelValue({
+      label: "Certificate ID",
+      value: certificate.certificateId,
+      x: rightX,
+      y: descriptionTop,
+      width: rightWidth,
+    });
+
+    rightCursorY -= 10;
+
+    rightCursorY = drawLabelValue({
+      label: "Duration",
+      value: `${certificate.duration} | ${formatDate(certificate.startDate)} to ${formatDate(certificate.endDate)}`,
+      x: rightX,
+      y: rightCursorY,
+      width: rightWidth,
+    });
+
+    rightCursorY -= 10;
+
+    rightCursorY = drawLabelValue({
+      label: "Issued by",
+      value: certificate.issuedBy,
+      x: rightX,
+      y: rightCursorY,
+      width: rightWidth,
+    });
+
+    rightCursorY -= 10;
+
+    page.drawText("STATUS", {
+      x: rightX,
+      y: rightCursorY,
+      size: 9,
       font: fontBold,
-      color: rgb(1, 1, 1),
+      color: palette.accent,
     });
 
-    page.drawText("This certificate is proudly presented to", {
-      x: width / 2 - 180,
-      y: height - 136,
-      size: 16,
-      font: fontRegular,
-      color: rgb(0.8, 0.8, 0.8),
+    page.drawRectangle({
+      x: rightX,
+      y: rightCursorY - 24,
+      width: 116,
+      height: 20,
+      color: statusColor,
+      borderWidth: 0,
     });
 
-    page.drawText(certificate.name, {
-      x: 120,
-      y: height - 182,
-      size: 28,
+    page.drawText(formatStatus(certificate.status).toUpperCase(), {
+      x: rightX + 12,
+      y: rightCursorY - 18,
+      size: 10,
       font: fontBold,
-      color: rgb(1, 1, 1),
+      color: palette.background,
     });
-
-    page.drawText(certificate.role, {
-      x: 120,
-      y: height - 214,
-      size: 18,
-      font: fontRegular,
-      color: rgb(0.85, 0.85, 0.85),
-    });
-
-    const contentLines = [
-      `Contribution: ${certificate.contribution}`,
-      `Description: ${certificate.description}`,
-      `Duration: ${certificate.duration} (${formatDate(certificate.startDate)} - ${formatDate(certificate.endDate)})`,
-      `Issued by: ${certificate.issuedBy}`,
-      `Issue date: ${formatDate(certificate.issueDate)}`,
-      `Status: ${certificate.status.toUpperCase()}`,
-    ];
-
-    let cursorY = height - 270;
-
-    for (const line of contentLines) {
-      page.drawText(line, {
-        x: 60,
-        y: cursorY,
-        size: 14,
-        font: fontRegular,
-        color: rgb(1, 1, 1),
-        maxWidth: width - 120,
-      });
-      cursorY -= 26;
-    }
 
     const qrDataUrl = await QRCode.toDataURL(certificate.verificationUrl, {
       width: 150,
@@ -145,34 +375,66 @@ export default function CertificateViewer({ certificate }: Props) {
     const signatureBytes = await convertSignatureToWhite("/signs/cto.png");
     const signatureImage = await pdfDoc.embedPng(signatureBytes);
 
+    page.drawText("Verify authenticity", {
+      x: 88,
+      y: 126,
+      size: 11,
+      font: fontBold,
+      color: palette.accent,
+    });
+
+    page.drawText("Scan the QR code to open the official", {
+      x: 88,
+      y: 110,
+      size: 10,
+      font: fontRegular,
+      color: palette.textSoft,
+    });
+
+    page.drawText("verification record on Lioran Group.", {
+      x: 88,
+      y: 96,
+      size: 10,
+      font: fontRegular,
+      color: palette.textSoft,
+    });
+
     page.drawImage(qrImage, {
-      x: 60,
-      y: 60,
-      width: 120,
-      height: 120,
+      x: 88,
+      y: 148,
+      width: 92,
+      height: 92,
     });
 
     page.drawImage(signatureImage, {
-      x: width - 210,
-      y: 76,
-      width: 160,
-      height: 52,
+      x: width - 244,
+      y: 132,
+      width: 146,
+      height: 46,
     });
 
     page.drawText("Swaraj Puppalwar", {
-      x: width - 210,
-      y: 58,
+      x: width - 240,
+      y: 116,
       size: 14,
-      font: fontRegular,
-      color: rgb(1, 1, 1),
+      font: fontBold,
+      color: palette.text,
     });
 
     page.drawText("CTO, Lioran Group", {
-      x: width - 210,
-      y: 42,
+      x: width - 240,
+      y: 98,
       size: 12,
       font: fontRegular,
-      color: rgb(0.8, 0.8, 0.8),
+      color: palette.textSoft,
+    });
+
+    page.drawText(`Issued on ${formatDate(certificate.issueDate)}`, {
+      x: width - 240,
+      y: 80,
+      size: 10,
+      font: fontRegular,
+      color: palette.accentSoft,
     });
 
     const pdfBytes = await pdfDoc.save();
@@ -184,6 +446,7 @@ export default function CertificateViewer({ certificate }: Props) {
   }
 
   const isVerified = certificate.status === "active";
+  const statusMessage = getStatusMessage(certificate.status);
 
   return (
     <div
@@ -204,10 +467,11 @@ export default function CertificateViewer({ certificate }: Props) {
             {certificate.role} for {certificate.organization}. Certificate ID{" "}
             {certificate.certificateId} is currently{" "}
             <strong style={{ textTransform: "capitalize" }}>
-              {certificate.status}
+              {formatStatus(certificate.status)}
             </strong>
             .
           </p>
+          <p style={{ marginTop: 0 }}>{statusMessage}</p>
           <div className="button-row">
             <button
               type="button"

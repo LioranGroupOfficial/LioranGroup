@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Certificate from "../models/Certificate";
 import type {
   CertificateInput,
@@ -107,7 +108,13 @@ export async function createCertificate(input: CertificateInput) {
 }
 
 export async function getCertificateById(certificateId: string) {
-  const certificate = await Certificate.findOne({ certificateId }).lean();
+  const query = mongoose.Types.ObjectId.isValid(certificateId)
+    ? {
+        $or: [{ certificateId }, { _id: certificateId }],
+      }
+    : { certificateId };
+
+  const certificate = await Certificate.findOne(query).lean();
   return certificate ? serializeCertificate(certificate as CertificateSource) : null;
 }
 
