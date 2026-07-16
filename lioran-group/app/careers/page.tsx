@@ -1,29 +1,101 @@
+import { Award, BriefcaseBusiness, GraduationCap, Mail, SearchCheck } from "lucide-react";
+import CardTitle from "@/components/CardTitle";
+
+const roles = [
+  [
+    "Full Stack Developer Intern",
+    "3 months",
+    "Daily 4 hours",
+    "6:00 PM to 10:00 PM",
+    "Unpaid internship focused on product and platform engineering.",
+  ],
+  [
+    "Rust Developer Intern",
+    "3 months",
+    "Daily 4 hours",
+    "6:00 PM to 10:00 PM",
+    "Unpaid internship focused on systems work and infrastructure implementation.",
+  ],
+  [
+    "Developer Support Intern",
+    "3 months",
+    "Daily 4 hours",
+    "6:00 PM to 10:00 PM",
+    "Unpaid internship focused on user support, issue handling, and developer assistance.",
+  ],
+];
+
 export default function CareersPage() {
   return (
-    <section className="px-6 py-16 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl md:text-4xl font-bold">Careers</h1>
-      <p className="text-slate-300">
-        We are not hiring actively. If you are interested in collaborating,
-        contributing, or exploring internships, reach out with context and work
-        samples.
-      </p>
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Culture & Expectations</h2>
-        <ul className="list-disc list-inside text-slate-300 space-y-2">
-          <li>Ownership and craftsmanship</li>
-          <li>Disciplined execution and reliability</li>
-          <li>Clear communication</li>
-          <li>Builder mindset</li>
-        </ul>
-      </div>
-      <div className="space-y-2">
-        <h2 className="text-2xl font-semibold">Opportunities</h2>
-        <p className="text-slate-300">
-          Internships and contributor roles may be available within specific
-          products or branches. Contact us with details.
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Careers</span>
+        <h1>Jobs at LDS.</h1>
+        <p>
+          Lioran Group itself is the parent organization. The active openings
+          here are internship roles under LDS.
         </p>
-      </div>
-    </section>
+      </section>
+
+      <section className="card-grid">
+        <article className="card">
+          <CardTitle icon={GraduationCap}>LDS Internship Program</CardTitle>
+          <p className="card-copy">
+            Each internship runs for 3 months, 4 hours daily, from 6:00 PM to
+            10:00 PM. These are unpaid roles.
+          </p>
+          <p className="card-copy">
+            Interns receive certificates from Lioran Group and LDS, along with
+            GitHub badges for their contribution record.
+          </p>
+        </article>
+      </section>
+
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Duration</th>
+            <th>Commitment</th>
+            <th>Time</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {roles.map(([role, duration, commitment, time, details]) => (
+            <tr key={role}>
+              <td>{role}</td>
+              <td>{duration}</td>
+              <td>{commitment}</td>
+              <td>{time}</td>
+              <td>{details}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <section className="card-grid two-column">
+        <article className="card">
+          <CardTitle icon={SearchCheck}>What LDS Looks For</CardTitle>
+          <ul className="plain-list">
+            <li>People who ship instead of just discussing shipping.</li>
+            <li>Comfort with TypeScript, backend work, or systems programming depending on role.</li>
+            <li>Willingness to work inside infrastructure-oriented products with discipline.</li>
+            <li>Clear communication and consistent contribution habits.</li>
+          </ul>
+        </article>
+        <article className="card">
+          <CardTitle icon={Mail}>How To Apply</CardTitle>
+          <p className="card-copy">
+            Send role preference, work samples, GitHub profile, and a short
+            introduction to <a href="mailto:careers@lioran.group">careers@lioran.group</a>.
+          </p>
+          <p className="card-copy">
+            Mention whether you are applying for Full Stack Developer Intern,
+            Rust Developer Intern, or Developer Support Intern.
+          </p>
+        </article>
+      </section>
+    </div>
   );
 }
-

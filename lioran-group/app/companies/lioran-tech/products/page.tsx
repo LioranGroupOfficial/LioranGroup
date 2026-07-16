@@ -2,27 +2,19 @@ import Link from "next/link";
 
 export default function LioranTechProductsPage() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Products</h2>
-      <ul className="space-y-3">
-        <li>
-          <Link
-            href="/companies/lioran-tech/products/hushar-spreadsheet"
-            className="text-blue-400 hover:underline"
-          >
-            Hushar Spreadsheet
+    <section className="card-grid">
+      <article className="card">
+        <h2 className="card-title">Retired Product Pages</h2>
+        <p className="card-copy">
+          Hostel Buddy and Hushar Spreadsheet have been removed from the active
+          public product catalog.
+        </p>
+        <div>
+          <Link href="/products" className="button-link">
+            View current public products
           </Link>
-        </li>
-        <li>
-          <Link
-            href="/companies/lioran-tech/products/hostel-buddy"
-            className="text-blue-400 hover:underline"
-          >
-            Hostel Buddy
-          </Link>
-        </li>
-      </ul>
-    </div>
+        </div>
+      </article>
+    </section>
   );
 }
-

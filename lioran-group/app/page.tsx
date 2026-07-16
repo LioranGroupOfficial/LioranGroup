@@ -1,219 +1,231 @@
-"use client";
+import Link from "next/link";
+import {
+  Building2,
+  CircleHelp,
+  Compass,
+  Database,
+  FileCode2,
+  Flag,
+  Layers3,
+  ShieldCheck,
+} from "lucide-react";
+import { products, siteVersion } from "@/app/lib/site";
+import CardTitle from "@/components/CardTitle";
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-
-type Token = {
-  text: string;
-  color: string;
-};
-
-type CodeLine = Token[];
-
-const CODE_LINES: CodeLine[] = [
+const architectureRows = [
   [
-    { text: "struct", color: "text-sky-400" },
-    { text: " LioranGroup", color: "text-emerald-400" },
-    { text: " {", color: "text-orange-400" },
+    "Parent layer",
+    "Lioran Group",
+    "Parent organization holding LDS and maintaining ecosystem identity and governance.",
   ],
   [
-    { text: "  founded", color: "text-purple-400" },
-    { text: ": ", color: "text-white/70" },
-    { text: "2025", color: "text-amber-400" },
-    { text: ",", color: "text-orange-400" },
+    "Company layer",
+    "LDS",
+    "Deep-tech infrastructure company focused on Indian-built developer systems and data sovereignty.",
   ],
   [
-    { text: "  origin", color: "text-purple-400" },
-    { text: ": ", color: "text-white/70" },
-    { text: "\"An idea that grew into a startup\"", color: "text-amber-400" },
-    { text: ",", color: "text-orange-400" },
+    "Product layer",
+    "LioranDB",
+    "Database product under LDS focused on predictable infrastructure behavior.",
   ],
-  [
-    { text: "  mission", color: "text-purple-400" },
-    { text: ": ", color: "text-white/70" },
-    { text: "\"Build long-term systems\"", color: "text-amber-400" },
-    { text: ",", color: "text-orange-400" },
-  ],
-  [
-    { text: "  focus", color: "text-purple-400" },
-    { text: ": ", color: "text-white/70" },
-    { text: "vec!", color: "text-sky-400" },
-    { text: "[", color: "text-orange-400" },
-  ],
-  [
-    { text: "    ", color: "" },
-    { text: "\"Technology\"", color: "text-amber-400" },
-    { text: ",", color: "text-orange-400" },
-  ],
-  [
-    { text: "    ", color: "" },
-    { text: "\"Scalability\"", color: "text-amber-400" },
-    { text: ",", color: "text-orange-400" },
-  ],
-  [
-    { text: "    ", color: "" },
-    { text: "\"Strong foundations\"", color: "text-amber-400" },
-    { text: ",", color: "text-orange-400" },
-  ],
-  [
-    { text: "  ]", color: "text-orange-400" },
-    { text: ",", color: "text-orange-400" },
-  ],
-  [{ text: "}", color: "text-orange-400" }],
 ];
 
-const TERMINAL_OUTPUT = [
-  "$ initializing Lioran-Group",
-  "[ OK ] registering idea (2025)",
-  "[ OK ] forming core team",
-  "[ OK ] building first systems",
-  "[ OK ] launching early products",
-  "[ NEXT ] scaling responsibly",
-  "[ RUNNING ] long-term execution mode",
+const faqRows = [
+  [
+    "What does Lioran Group do?",
+    "Lioran Group is the parent organization. LDS is the company under it that builds the products and jobs.",
+  ],
+  [
+    "What is LDS?",
+    "Lioran Developer Solutions is a deep-tech infra company focused on reducing dependency on foreign dev infra and supporting data staying in India.",
+  ],
+  [
+    "Why only one theme?",
+    "The brand is intentionally dark, stable, and consistent across every product surface.",
+  ],
+  [
+    "Where do I start?",
+    "Start with LDS, then inspect LioranDB and the future product pipeline under it.",
+  ],
 ];
 
 export default function HomePage() {
-  const [typedLines, setTypedLines] = useState<CodeLine[]>([]);
-  const [outputLines, setOutputLines] = useState<string[]>([]);
-  const [phase, setPhase] = useState<"typing" | "output">("typing");
-
-  useEffect(() => {
-    let timers: NodeJS.Timeout[] = [];
-
-    const start = () => {
-      setTypedLines([]);
-      setOutputLines([]);
-      setPhase("typing");
-
-      CODE_LINES.forEach((line, i) => {
-        timers.push(
-          setTimeout(() => {
-            setTypedLines((p) => [...p, line]);
-          }, 120 * i)
-        );
-      });
-
-      timers.push(
-        setTimeout(() => {
-          setPhase("output");
-          TERMINAL_OUTPUT.forEach((line, i) => {
-            timers.push(
-              setTimeout(() => {
-                setOutputLines((p) => [...p, line]);
-              }, 220 * i)
-            );
-          });
-        }, 2500)
-      );
-    };
-
-    start();
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
   return (
-    <section className="px-6 py-24 max-w-7xl mx-auto space-y-32">
-      {/* Hero */}
-      <div className="text-center space-y-6">
-        <h1 className="text-5xl md:text-6xl font-bold text-white">
-          Lioran Group
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Engineering First</span>
+        <h1
+          style={{ fontSize: "clamp(2.5rem, 6vw, 4.75rem)", lineHeight: 1.05 }}
+        >
+          Lioran Group builds infrastructure.
         </h1>
-
-        <p className="text-white/70 max-w-2xl mx-auto">
-          A technology group focused on building long-term, scalable products.
-          We design systems meant to last — not chase trends.
+        <p style={{ maxWidth: 760 }}>
+          Lioran Group is the parent organization behind LDS. The ecosystem is
+          built to support Indian-developed infrastructure products, reduce
+          dependency on foreign developer infra, and keep sensitive data closer
+          to where it belongs.
         </p>
-
-        <div className="flex justify-center gap-3">
-          <a
-            href="/companies"
-            className="h-10 px-5 rounded-lg bg-white text-black text-sm font-medium inline-flex items-center"
-          >
-            Explore Companies
-          </a>
-          <a
-            href="/careers"
-            className="h-10 px-5 rounded-lg border border-white/15 text-white text-sm font-medium inline-flex items-center"
-          >
-            View Careers
-          </a>
+        <div className="button-row">
+          <Link href="/companies/lcs" className="button-primary">
+            Explore LDS
+          </Link>
+          <Link href="/products" className="button-secondary">
+            View Products
+          </Link>
         </div>
-      </div>
+      </section>
 
-      {/* Explanation */}
-      <div className="grid md:grid-cols-3 gap-10 text-sm text-slate-400">
-        <div>
-          <h3 className="text-white font-semibold mb-2">Why Lioran</h3>
+      <section className="section-block">
+        <div className="section-heading">
+          <h2 className="nav-link">
+            <FileCode2 className="nav-icon" />
+            <span>Code Example</span>
+          </h2>
           <p>
-            We started Lioran to build systems that solve real operational
-            problems, not short-lived tools. Longevity and clarity come first.
+            Code replaces decorative imagery. The homepage should explain the
+            ecosystem in the same language the products are built with.
           </p>
         </div>
-        <div>
-          <h3 className="text-white font-semibold mb-2">What We Offer</h3>
-          <p>
-            Infrastructure-driven products, internal platforms, and focused
-            software built for reliability, scale, and simplicity.
-          </p>
-        </div>
-        <div>
-          <h3 className="text-white font-semibold mb-2">How It Started</h3>
-          <p>
-            In 2025, Lioran began as an idea. Through consistent execution, it
-            evolved into a structured startup with clear long-term direction.
-          </p>
-        </div>
-      </div>
+        <pre className="code-panel">{`group Lioran {
+  version: "${siteVersion}";
+  parent_org: "Lioran Group";
+  companies: [
+    {
+      name: "LDS",
+      domain: "lioransolutions.com",
+      focus: ["deep tech", "developer infra", "data sovereignty"],
+      products: ["LioranDB", "Lioran Bastion", "Lioran Auth"]
+    }
+  ];
+  principles: [
+    "minimal interfaces",
+    "predictable systems",
+    "indian-built infrastructure first"
+  ];
+}`}</pre>
+      </section>
 
-      {/* Code + Terminal */}
-      <div className="grid md:grid-cols-2 gap-12">
-        {/* Code */}
-        <motion.pre className="bg-[#0b0f14] h-[420px] rounded-xl p-6 border border-white/10 font-mono text-sm overflow-y-auto">
-          {typedLines.map((line, i) => (
-            <div key={i} className="whitespace-pre">
-              {line.map((token, j) => (
-                <span key={j} className={token.color}>
-                  {token.text}
-                </span>
-              ))}
-            </div>
+      <section className="section-block">
+        <div className="section-heading">
+          <h2>Products</h2>
+          <p>
+            Product direction under LDS, including the current database product
+            and the next infrastructure surfaces in the pipeline.
+          </p>
+        </div>
+        <div className="card-grid two-column">
+          {products.map((product) => (
+            <article key={product.name} className="card">
+              <p className="eyebrow">{product.status}</p>
+              <CardTitle
+                as="h3"
+                icon={
+                  product.name === "LioranDB"
+                    ? Database
+                    : product.name === "Lioran Bastion"
+                      ? Layers3
+                      : ShieldCheck
+                }
+              >
+                {product.name}
+              </CardTitle>
+              <p className="card-copy">{product.summary}</p>
+              <p className="card-copy">
+                {product.owner} · {product.domain}
+              </p>
+              <div>
+                <Link href={product.href} className="button-link">
+                  View details
+                </Link>
+              </div>
+            </article>
           ))}
-          {phase === "typing" && (
-            <span className="inline-block w-2 h-4 bg-white/60 ml-1 animate-pulse" />
-          )}
-        </motion.pre>
+        </div>
+      </section>
 
-        {/* Terminal */}
-        <motion.div className="bg-black h-[420px] rounded-xl border border-white/10 p-6 font-mono text-sm overflow-y-auto">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="w-3 h-3 bg-red-500 rounded-full" />
-            <span className="w-3 h-3 bg-yellow-500 rounded-full" />
-            <span className="w-3 h-3 bg-green-500 rounded-full" />
-            <span className="ml-3 text-white/60">lioran@system</span>
-          </div>
+      <section className="section-block">
+        <div className="section-heading">
+          <h2 className="nav-link">
+            <Layers3 className="nav-icon" />
+            <span>Architecture</span>
+          </h2>
+          <p>
+            The ecosystem is intentionally small and explicit. Each layer has a
+            clear responsibility.
+          </p>
+        </div>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Surface</th>
+              <th>Responsibility</th>
+            </tr>
+          </thead>
+          <tbody>
+            {architectureRows.map(([layer, surface, responsibility]) => (
+              <tr key={layer}>
+                <td>{layer}</td>
+                <td>{surface}</td>
+                <td>{responsibility}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
 
-          {outputLines.map((line, i) => (
-            <div key={i} className="text-emerald-400">
-              {line}
-            </div>
+      <section className="card-grid three-column">
+        <article className="card">
+          <CardTitle as="h3" icon={Building2}>
+            Parent Organization
+          </CardTitle>
+          <ul className="plain-list">
+            <li>Lioran Group holds LDS as the infrastructure company.</li>
+            <li>The group site explains hierarchy, identity, and ecosystem direction.</li>
+            <li>Jobs and products are presented under LDS, not under LG directly.</li>
+          </ul>
+        </article>
+        <article className="card">
+          <CardTitle as="h3" icon={Flag}>
+            LDS Focus
+          </CardTitle>
+          <ul className="plain-list">
+            <li>Reduce dependency on foreign developer infrastructure.</li>
+            <li>Support Indian data residency and government-aligned data locality goals.</li>
+            <li>Build 100 percent Indian-developed infrastructure products.</li>
+          </ul>
+        </article>
+        <article className="card">
+          <CardTitle as="h3" icon={Compass}>
+            Current Direction
+          </CardTitle>
+          <ul className="plain-list">
+            <li>LioranDB is the current flagship product under LDS.</li>
+            <li>Lioran Bastion is planned as storage infrastructure similar to S3.</li>
+            <li>Lioran Auth is planned as backend authentication infrastructure.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section className="section-block">
+        <div className="section-heading">
+          <h2 className="nav-link">
+            <CircleHelp className="nav-icon" />
+            <span>FAQ</span>
+          </h2>
+          <p>Short answers for engineers evaluating the ecosystem.</p>
+        </div>
+        <div className="card-grid">
+          {faqRows.map(([question, answer]) => (
+            <article key={question} className="card">
+              <CardTitle as="h3" icon={CircleHelp}>
+                {question}
+              </CardTitle>
+              <p className="card-copy">{answer}</p>
+            </article>
           ))}
-
-          {phase === "output" && (
-            <span className="inline-block w-2 h-4 bg-emerald-400 ml-1 animate-pulse" />
-          )}
-        </motion.div>
-      </div>
-
-      {/* Roadmap */}
-      <div className="max-w-3xl space-y-6">
-        <h2 className="text-2xl font-semibold text-white">Roadmap</h2>
-        <ul className="space-y-3 text-slate-400 text-sm">
-          <li>• 2025 — Concept, foundation, early internal builds</li>
-          <li>• 2026 — Product stabilization and limited public access</li>
-          <li>• 2027 — Scaling core platforms and infrastructure</li>
-          <li>• Long-term — Multi-sector expansion with strong fundamentals</li>
-        </ul>
-      </div>
-    </section>
+        </div>
+      </section>
+    </div>
   );
 }

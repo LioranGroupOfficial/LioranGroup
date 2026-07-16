@@ -2,29 +2,23 @@ type Props = {
   title: string;
   value: string;
   link?: string;
+  detail?: string;
 };
 
-export default function ContactCard({ title, value, link }: Props) {
+export default function ContactCard({ title, value, link, detail }: Props) {
   return (
-    <div className="group relative bg-black border border-white/10 rounded-2xl p-6 transition-all hover:border-white/20">
-      <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-sky-500/40 to-transparent" />
-
-      <h3 className="mb-2 font-semibold text-white">{title}</h3>
+    <div className="card">
+      <h3 className="card-title">{title}</h3>
 
       {link ? (
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block whitespace-pre-line text-white/80 transition-colors group-hover:text-sky-400"
-        >
+        <a href={link} target="_blank" rel="noreferrer" className="card-copy whitespace-pre-line">
           {value}
         </a>
       ) : (
-        <p className="whitespace-pre-line text-white/70">
-          {value}
-        </p>
+        <p className="card-copy whitespace-pre-line">{value}</p>
       )}
+
+      {detail ? <p className="card-copy">{detail}</p> : null}
     </div>
   );
 }

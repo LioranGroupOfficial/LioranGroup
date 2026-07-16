@@ -6,35 +6,25 @@ export default function LioranTechLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="px-6 py-16 max-w-6xl mx-auto space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-bold">Lioran Tech</h1>
-        <p className="text-slate-300">
-          Overview, products, and team information for Lioran Tech.
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Archive</span>
+        <h1>Lioran Tech</h1>
+        <p>
+          This branch is no longer part of the active public product catalog.
+          Current public work now centers on LDS and LioranDB.
         </p>
-      </div>
-      <nav className="flex flex-wrap gap-4">
-        <Link
-          href="/companies/lioran-tech"
-          className="text-blue-400 hover:underline"
-        >
-          Overview
-        </Link>
-        <Link
-          href="/companies/lioran-tech/products"
-          className="text-blue-400 hover:underline"
-        >
-          Products
-        </Link>
-        <Link
-          href="/companies/lioran-tech/team"
-          className="text-blue-400 hover:underline"
-        >
-          Team
-        </Link>
-      </nav>
+        <div className="button-row">
+          <Link href="/companies/lcs" className="button-secondary">
+            Open LDS
+          </Link>
+          <Link href="/products" className="button-secondary">
+            View Current Products
+          </Link>
+        </div>
+      </section>
+
       {children}
-    </section>
+    </div>
   );
 }
-

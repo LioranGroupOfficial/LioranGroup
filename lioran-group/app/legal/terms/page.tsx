@@ -1,34 +1,31 @@
 export default function TermsPage() {
   return (
-    <section className="px-6 py-16 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl md:text-4xl font-bold">Terms of Use</h1>
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Terms</span>
+        <h1>Terms of Use</h1>
+        <p>
+          Access to Lioran Group products and websites requires lawful and
+          responsible use. Experimental systems may change without notice.
+        </p>
+      </section>
 
-      <p className="text-slate-300">
-        These Terms of Use govern your access to and use of Lioran Group websites,
-        platforms, and products.
-      </p>
-
-      <p className="text-slate-300">
-        By accessing or using our services, you agree to use them responsibly and
-        only for lawful purposes. You must not misuse, reverse-engineer, exploit,
-        or attempt to disrupt our systems.
-      </p>
-
-      <p className="text-slate-300">
-        Some Lioran Group products may be experimental, early-access, or under
-        active development. Features, availability, and performance may change
-        over time.
-      </p>
-
-      <p className="text-slate-300">
-        We reserve the right to modify, suspend, or discontinue any product or
-        service at any time, with or without prior notice.
-      </p>
-
-      <p className="text-slate-400 text-sm">
-        Continued use of our services constitutes acceptance of these terms and
-        any future updates.
-      </p>
-    </section>
+      <section className="card-grid">
+        <article className="card">
+          <h2 className="card-title">Acceptable Use</h2>
+          <p className="card-copy">
+            Do not misuse, disrupt, exploit, or reverse-engineer public systems
+            beyond permitted interfaces and applicable law.
+          </p>
+        </article>
+        <article className="card">
+          <h2 className="card-title">Service Changes</h2>
+          <p className="card-copy">
+            Features, pricing, and availability can change as products mature.
+            Continued use implies acceptance of updated terms.
+          </p>
+        </article>
+      </section>
+    </div>
   );
 }

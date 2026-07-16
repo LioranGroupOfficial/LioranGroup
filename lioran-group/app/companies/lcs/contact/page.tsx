@@ -1,29 +1,16 @@
-import ContactCard from "@/components/ContactCard";
-
 export default function LcsContactPage() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Contact</h2>
-      <div className="grid md:grid-cols-3 gap-6">
-        <ContactCard
-          title="Phone & WhatsApp"
-          value="+91 8010182409"
-          link="https://wa.me/918010182409"
-        />
-        <ContactCard
-          title="Support Email"
-          value="support@lioran.group"
-          link="mailto:support@lioran.group"
-        />
-        <ContactCard
-          title="Leadership Emails"
-          value={`ceo@lioran.group
-cfo@lioran.group
-cto@lioran.group
-coo@lioran.group`}
-        />
-      </div>
-    </div>
+    <section className="card-grid two-column">
+      <article className="card">
+        <h2 className="card-title">Primary Contact</h2>
+        <p className="card-copy">contact@lioran.group</p>
+        <p className="card-copy">Use this channel for product, partnership, and infrastructure inquiries.</p>
+      </article>
+      <article className="card">
+        <h2 className="card-title">Support Channels</h2>
+        <p className="card-copy">support@lioran.group</p>
+        <p className="card-copy">Discord is the fastest path for community-facing discussion.</p>
+      </article>
+    </section>
   );
 }
-

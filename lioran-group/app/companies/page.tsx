@@ -1,41 +1,53 @@
 import Link from "next/link";
+import { Boxes, Building2 } from "lucide-react";
+import CardTitle from "@/components/CardTitle";
 
-const branches = [
+const companies = [
   {
-    slug: "lcs",
-    name: "LCS",
-    summary: "R&D and systems for coordination and services.",
+    name: "LDS",
+    href: "/companies/lcs",
+    label: "lioransolutions.com",
+    summary:
+      "Lioran Developer Solutions is the deep-tech infrastructure company under Lioran Group, focused on Indian-built developer systems and data sovereignty.",
   },
   {
-    slug: "lioran-tech",
-    name: "Lioran Tech",
-    summary: "Product engineering and software ventures.",
-  },
-  {
-    slug: "future",
-    name: "Future Ventures",
-    summary: "Exploratory initiatives and future projects.",
+    name: "Future Products",
+    href: "/companies/future",
+    label: "Pipeline under LDS",
+    summary:
+      "Future infrastructure products under LDS, including Lioran Bastion and Lioran Auth.",
   },
 ];
 
 export default function CompaniesPage() {
   return (
-    <section className="px-6 py-16 max-w-6xl mx-auto">
-      <h1 className="text-3xl md:text-4xl font-bold mb-8">Companies</h1>
-      <div className="grid md:grid-cols-2 gap-6">
-        {branches.map((b) => (
-          <Link
-            key={b.slug}
-            href={`/companies/${b.slug}`}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-slate-700"
-          >
-            <h2 className="text-xl font-semibold">{b.name}</h2>
-            <p className="text-slate-400 mt-2">{b.summary}</p>
-            <span className="text-blue-400 mt-3 inline-block">Explore</span>
-          </Link>
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Companies</span>
+        <h1>The current company structure.</h1>
+        <p>
+          Lioran Group is the parent organization. LDS is the company under it.
+          Products like LioranDB belong under LDS rather than appearing as
+          companies themselves.
+        </p>
+      </section>
+
+      <section className="card-grid">
+        {companies.map((company) => (
+          <article key={company.name} className="card">
+            <CardTitle icon={company.name === "LDS" ? Building2 : Boxes}>
+              {company.name}
+            </CardTitle>
+            <p className="card-copy">{company.summary}</p>
+            <p className="card-copy">{company.label}</p>
+            <div>
+              <Link href={company.href} className="button-link">
+                Explore
+              </Link>
+            </div>
+          </article>
         ))}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
-

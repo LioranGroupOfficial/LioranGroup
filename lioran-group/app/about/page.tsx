@@ -1,29 +1,60 @@
+import { Compass, Flag, Shield } from "lucide-react";
+import CardTitle from "@/components/CardTitle";
+
+const principles = [
+  "Professional, stable, technical, serious, minimal, fast, trustworthy, premium.",
+  "No corporate buzzwords, decorative graphics, or social-media styling.",
+  "Interfaces should feel closer to GitHub, Stripe Docs, Linear, and Rust documentation.",
+];
+
 export default function AboutPage() {
   return (
-    <section className="px-6 py-16 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl md:text-4xl font-bold">About Lioran Group</h1>
-      <p className="text-slate-300">
-        Lioran Group was formed to build durable, technology-driven ventures with
-        a focus on slow, sustainable growth. We prioritize strong foundations,
-        pragmatic execution, and long-term value creation.
-      </p>
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Vision</h2>
-        <p className="text-slate-300">
-          We are rooted in India with a global outlook. Our philosophy emphasizes
-          disciplined product development, ethical business practices, and steady expansion.
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">About</span>
+        <h1>One ecosystem. One operating philosophy.</h1>
+        <p>
+          Lioran Group exists to build infrastructure-oriented products with
+          clear engineering standards. The company voice, interface rules, and
+          product architecture are treated as one system.
         </p>
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Ethics & Principles</h2>
-        <ul className="list-disc list-inside text-slate-300 space-y-2">
-          <li>Sustainable growth over short-term gains</li>
-          <li>Transparency and accountability</li>
-          <li>User-centric design and engineering</li>
-          <li>Thoughtful stewardship of technology</li>
+      </section>
+
+      <section className="card-grid three-column">
+        <article className="card">
+          <CardTitle icon={Flag}>Mission</CardTitle>
+          <p className="card-copy">
+            Build durable software systems that remain understandable as they
+            scale.
+          </p>
+        </article>
+        <article className="card">
+          <CardTitle icon={Compass}>Philosophy</CardTitle>
+          <p className="card-copy">
+            Engineering first. Documentation before marketing. Benchmarks and
+            architecture over slogans.
+          </p>
+        </article>
+        <article className="card">
+          <CardTitle icon={Shield}>Identity</CardTitle>
+          <p className="card-copy">
+            Dark theme only, strict palette control, nearly square components,
+            and minimal motion.
+          </p>
+        </article>
+      </section>
+
+      <section className="section-block">
+        <div className="section-heading">
+          <h2>Brand Principles</h2>
+          <p>The interface is designed to communicate technical confidence.</p>
+        </div>
+        <ul className="rule-list">
+          {principles.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
-

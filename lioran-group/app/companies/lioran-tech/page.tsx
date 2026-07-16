@@ -1,12 +1,13 @@
 export default function LioranTechOverviewPage() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Overview</h2>
-      <p className="text-slate-300">
-        Lioran Tech builds and operates software products with pragmatic engineering,
-        focused on clarity, reliability, and long-term value.
-      </p>
-    </div>
+    <section className="card-grid">
+      <article className="card">
+        <h2 className="card-title">Archived Public Branch</h2>
+        <p className="card-copy">
+          Legacy public content that previously lived under Lioran Tech has been
+          retired from the active product structure.
+        </p>
+      </article>
+    </section>
   );
 }
-

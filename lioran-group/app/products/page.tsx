@@ -1,72 +1,59 @@
 import Link from "next/link";
-
-const products = [
-  {
-    slug: "hushar-spreadsheet",
-    link: "/companies/lioran-tech/products/hushar-spreadsheet",
-    name: "Hushar Spreadsheet",
-    status: "Alpha · Restricted Access",
-    description:
-      "Agent-driven spreadsheet system designed for users who dislike traditional spreadsheets.",
-    badgeColor: "text-sky-400",
-  },
-  {
-    slug: "hostel-buddy",
-    link: "/companies/lioran-tech/products/hostel-buddy",
-    name: "Hostel Buddy",
-    status: "R&D · Under Development",
-    description:
-      "Digital companion for simplifying hostel operations and student coordination.",
-    badgeColor: "text-yellow-400",
-  },
-];
+import { Database, Layers3, ShieldCheck } from "lucide-react";
+import { products } from "@/app/lib/site";
+import CardTitle from "@/components/CardTitle";
 
 export default function ProductsPage() {
   return (
-    <section className="bg-black px-6 py-16 max-w-6xl mx-auto">
-      {/* Header */}
-      <header className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-white">
-          Products
-        </h1>
-        <p className="text-slate-400 mt-3 max-w-2xl">
-          Products built under Lioran Tech, focused on practical systems and
-          real-world usability.
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Products</span>
+        <h1>Products under LDS.</h1>
+        <p>
+          Lioran Group is the parent organization. The products listed here are
+          under LDS, with LioranDB active and Bastion/Auth in the future
+          pipeline.
         </p>
-      </header>
+      </section>
 
-      {/* Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {products.map((p) => (
-          <Link
-            key={p.slug}
-            href={p.link}
-            className="group bg-black border border-slate-800 rounded-2xl p-6 transition hover:border-slate-700"
-          >
-            <div className="space-y-3">
-              <h2 className="text-xl font-semibold text-white">
-                {p.name}
-              </h2>
-
-              <p className="text-slate-400 text-sm leading-relaxed">
-                {p.description}
-              </p>
-
-              <div className="flex items-center justify-between pt-2">
-                <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full bg-slate-900 ${p.badgeColor}`}
+      <section className="card-grid two-column">
+        {products.map((product) => (
+          <article key={product.name} className="card">
+            <p className="eyebrow">{product.status}</p>
+            <CardTitle
+              icon={
+                product.name === "LioranDB"
+                  ? Database
+                  : product.name === "Lioran Bastion"
+                    ? Layers3
+                    : ShieldCheck
+              }
+            >
+              {product.name}
+            </CardTitle>
+            <p className="card-copy">{product.summary}</p>
+            <p className="card-copy">
+              Owner: {product.owner} · Domain: {product.domain}
+            </p>
+            <div>
+              {product.name === "LioranDB" ? (
+                <a
+                  href="https://liorandb.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="button-link"
                 >
-                  {p.status}
-                </span>
-
-                <span className="text-sky-400 text-sm group-hover:underline">
-                  View details →
-                </span>
-              </div>
+                  Open liorandb.com
+                </a>
+              ) : (
+                <Link href={product.href} className="button-link">
+                  Open product page
+                </Link>
+              )}
             </div>
-          </Link>
+          </article>
         ))}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

@@ -1,30 +1,51 @@
 import Link from "next/link";
+import { FileText, ReceiptText, Shield, Stamp } from "lucide-react";
+import CardTitle from "@/components/CardTitle";
+
+const links = [
+  { href: "/legal/privacy", label: "Privacy Policy" },
+  { href: "/legal/terms", label: "Terms of Use" },
+  { href: "/legal/refund", label: "Refund Policy" },
+  { href: "/license", label: "License" },
+  { href: "/security", label: "Security" },
+];
 
 export default function LegalPage() {
   return (
-    <section className="px-6 py-16 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl md:text-4xl font-bold">Legal</h1>
-      <p className="text-slate-300">
-        Policies and terms governing use of Lioran Group products and properties.
-      </p>
-      <ul className="space-y-3">
-        <li>
-          <Link href="/legal/privacy" className="text-blue-400 hover:underline">
-            Privacy Policy
-          </Link>
-        </li>
-        <li>
-          <Link href="/legal/terms" className="text-blue-400 hover:underline">
-            Terms of Use
-          </Link>
-        </li>
-        <li>
-          <Link href="/legal/refund" className="text-blue-400 hover:underline">
-            Refund Policy
-          </Link>
-        </li>
-      </ul>
-    </section>
+    <div className="page-shell page-grid">
+      <section className="page-intro">
+        <span className="eyebrow">Legal</span>
+        <h1>Policy surfaces for the Lioran ecosystem.</h1>
+        <p>
+          Legal pages stay plain, readable, and structured. No visual clutter,
+          no decorative content.
+        </p>
+      </section>
+
+      <section className="card-grid">
+        {links.map((link) => (
+          <article key={link.href} className="card">
+            <CardTitle
+              icon={
+                link.label === "Privacy Policy"
+                  ? Shield
+                  : link.label === "Terms of Use"
+                    ? FileText
+                    : link.label === "Refund Policy"
+                      ? ReceiptText
+                      : Stamp
+              }
+            >
+              {link.label}
+            </CardTitle>
+            <div>
+              <Link href={link.href} className="button-link">
+                Open page
+              </Link>
+            </div>
+          </article>
+        ))}
+      </section>
+    </div>
   );
 }
-
