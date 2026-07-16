@@ -1,13 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-
-export const alt = "Lioran Group Certificate of Achievement";
-export const size = {
-  width: 1200,
-  height: 630,
-};
-export const contentType = "image/png";
+export const dynamic = "force-dynamic";
 
 type Certificate = {
   certificateId: string;
@@ -22,32 +16,24 @@ type Certificate = {
 
 async function getCertificate(id: string): Promise<Certificate | null> {
   try {
-    const res = await fetch(
-      `https://lioran.group/api/certificates/${encodeURIComponent(id)}`,
-      {
-        cache: "no-store",
-        headers: {
-          Accept: "application/json",
-        },
-      },
-    );
+    const res = await fetch(`https://lioran.group/api/certificates/${id}`, {
+      cache: "no-store",
+    });
 
     if (!res.ok) {
       return null;
     }
 
     const json = await res.json();
-    return json?.data ?? null;
-  } catch {
+
+    return json.data ?? null;
+  } catch (error) {
+    console.error("Failed to fetch certificate:", error);
     return null;
   }
 }
 
 function formatIssueDate(value: string) {
-  if (!value) {
-    return "Not specified";
-  }
-
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
@@ -63,15 +49,11 @@ function formatIssueDate(value: string) {
 }
 
 function truncateText(value: string, maxLength: number) {
-  if (!value) {
-    return "Not specified";
-  }
-
   if (value.length <= maxLength) {
     return value;
   }
 
-  return `${value.slice(0, maxLength - 1).trim()}…`;
+  return `${value.slice(0, maxLength - 3).trim()}...`;
 }
 
 export default async function OpenGraphImage({
@@ -83,12 +65,14 @@ export default async function OpenGraphImage({
   const certificate = await getCertificate(id);
 
   const palette = {
-    dark: "#222831",
-    slate: "#393E46",
-    accent: "#948979",
-    cream: "#DFD0B8",
-    creamSoft: "#EEE7DC",
-    muted: "#B8AEA0",
+    paper: "#FAF7F0",
+    ink: "#26262E",
+    soft: "#5C5C66",
+    accent: "#AB8C52",
+    accentSoft: "#CAB690",
+    panel: "#F2EDE1",
+    border: "#BAA67D",
+    white: "#FFFDF8",
   };
 
   if (!certificate) {
@@ -101,8 +85,8 @@ export default async function OpenGraphImage({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "32px",
-            background: palette.dark,
+            background: palette.paper,
+            padding: "28px",
             fontFamily: "Arial, sans-serif",
           }}
         >
@@ -114,57 +98,59 @@ export default async function OpenGraphImage({
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              border: `3px solid ${palette.accent}`,
-              background: palette.slate,
-              color: palette.cream,
+              background: palette.panel,
+              border: `3px solid ${palette.border}`,
+              color: palette.ink,
             }}
           >
-            <span
+            <div
               style={{
                 display: "flex",
-                fontSize: 18,
+                fontSize: "18px",
                 fontWeight: 700,
                 letterSpacing: "4px",
                 color: palette.accent,
+                textTransform: "uppercase",
                 marginBottom: "18px",
               }}
             >
-              LIORAN GROUP
-            </span>
+              Lioran Group
+            </div>
 
-            <span
+            <div
               style={{
                 display: "flex",
-                fontSize: 52,
+                fontSize: "54px",
                 fontWeight: 800,
               }}
             >
               Certificate Not Found
-            </span>
+            </div>
 
-            <span
+            <div
               style={{
                 display: "flex",
                 marginTop: "18px",
-                fontSize: 20,
-                color: palette.muted,
+                fontSize: "22px",
+                color: palette.soft,
               }}
             >
-              The certificate ID could not be verified.
-            </span>
+              The requested certificate could not be verified.
+            </div>
           </div>
         </div>
       ),
-      size,
+      {
+        width: 1200,
+        height: 630,
+      },
     );
   }
 
-  const issueDate = formatIssueDate(certificate.issueDate);
-  const contribution = truncateText(certificate.contribution, 165);
-  const organization =
-    certificate.organization || "Lioran Group";
-  const issuedBy =
-    certificate.issuedBy || "Lioran Group";
+  const contribution = truncateText(certificate.contribution, 210);
+  const organization = truncateText(certificate.organization, 70);
+  const issuedBy = truncateText(certificate.issuedBy, 65);
+  const role = truncateText(certificate.role, 65);
 
   return new ImageResponse(
     (
@@ -173,28 +159,29 @@ export default async function OpenGraphImage({
           width: "1200px",
           height: "630px",
           display: "flex",
-          padding: "26px",
-          background: palette.dark,
-          color: palette.cream,
+          background: palette.paper,
+          padding: "28px",
           fontFamily: "Arial, sans-serif",
+          color: palette.ink,
         }}
       >
-        {/* Single filled certificate boundary */}
+        {/* One solid filled certificate boundary */}
         <div
           style={{
             width: "100%",
             height: "100%",
             display: "flex",
             flexDirection: "column",
-            padding: "38px 46px",
-            background: palette.slate,
-            border: `3px solid ${palette.accent}`,
+            background: palette.panel,
+            border: `3px solid ${palette.border}`,
+            padding: "38px 48px 34px",
           }}
         >
           {/* Header */}
           <div
             style={{
               display: "flex",
+              width: "100%",
               alignItems: "flex-start",
               justifyContent: "space-between",
             }}
@@ -205,62 +192,66 @@ export default async function OpenGraphImage({
                 flexDirection: "column",
               }}
             >
-              <span
+              <div
                 style={{
                   display: "flex",
-                  fontSize: 15,
+                  fontSize: "15px",
                   fontWeight: 700,
-                  letterSpacing: "4px",
+                  letterSpacing: "3px",
                   color: palette.accent,
+                  textTransform: "uppercase",
                 }}
               >
-                CERTIFICATE OF
-              </span>
+                Certificate of
+              </div>
 
-              <span
+              <div
                 style={{
                   display: "flex",
-                  marginTop: "5px",
-                  fontSize: 35,
-                  fontWeight: 900,
-                  letterSpacing: "1px",
-                  color: palette.cream,
+                  marginTop: "4px",
+                  fontSize: "39px",
+                  fontWeight: 800,
+                  letterSpacing: "-1px",
+                  color: palette.ink,
                 }}
               >
-                ACHIEVEMENT
-              </span>
+                Achievement
+              </div>
             </div>
 
             <div
               style={{
-                maxWidth: "420px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-end",
-                textAlign: "right",
+                maxWidth: "410px",
               }}
             >
-              <span
+              <div
                 style={{
                   display: "flex",
-                  fontSize: 14,
-                  color: palette.muted,
-                  marginBottom: "6px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  letterSpacing: "2px",
+                  color: palette.accent,
+                  textTransform: "uppercase",
                 }}
               >
                 Issued by
-              </span>
+              </div>
 
-              <span
+              <div
                 style={{
                   display: "flex",
-                  fontSize: 20,
+                  marginTop: "7px",
+                  fontSize: "19px",
                   fontWeight: 700,
-                  color: palette.cream,
+                  color: palette.ink,
+                  textAlign: "right",
                 }}
               >
                 {organization}
-              </span>
+              </div>
             </div>
           </div>
 
@@ -270,109 +261,126 @@ export default async function OpenGraphImage({
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginTop: "27px",
+              marginTop: "28px",
             }}
           >
-            <span
+            <div
               style={{
                 display: "flex",
-                fontSize: 17,
-                color: palette.muted,
+                fontSize: "17px",
+                color: palette.soft,
               }}
             >
               This certificate is proudly presented to
-            </span>
+            </div>
 
-            <span
-              style={{
-                display: "flex",
-                maxWidth: "1000px",
-                marginTop: "8px",
-                fontSize: certificate.name.length > 24 ? 47 : 56,
-                lineHeight: 1.05,
-                fontWeight: 900,
-                textAlign: "center",
-                color: palette.cream,
-              }}
-            >
-              {certificate.name}
-            </span>
-
-            <span
+            <div
               style={{
                 display: "flex",
                 marginTop: "9px",
-                fontSize: 23,
-                fontWeight: 600,
-                color: palette.accent,
+                fontSize: certificate.name.length > 30 ? "43px" : "52px",
+                fontWeight: 800,
+                lineHeight: 1.05,
+                textAlign: "center",
+                color: palette.ink,
               }}
             >
-              {certificate.role}
-            </span>
+              {certificate.name}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                marginTop: "10px",
+                fontSize: "23px",
+                fontStyle: "italic",
+                fontWeight: 600,
+                color: palette.accent,
+                textAlign: "center",
+              }}
+            >
+              {role}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                width: "370px",
+                height: "1px",
+                background: palette.border,
+                marginTop: "18px",
+              }}
+            />
           </div>
 
-          {/* Large details container */}
+          {/* Details containers */}
           <div
             style={{
               display: "flex",
               width: "100%",
-              minHeight: "180px",
-              marginTop: "27px",
-              padding: "24px 26px",
-              background: palette.dark,
-              border: `1px solid ${palette.accent}`,
+              flex: 1,
+              marginTop: "22px",
+              gap: "22px",
             }}
           >
             {/* Contribution */}
             <div
               style={{
-                flex: 1,
                 display: "flex",
                 flexDirection: "column",
-                paddingRight: "28px",
-                borderRight: `1px solid ${palette.accent}`,
+                flex: 1,
+                minHeight: "150px",
+                padding: "20px 24px",
+                background: palette.white,
+                border: `2px solid ${palette.accentSoft}`,
               }}
             >
-              <span
+              <div
                 style={{
                   display: "flex",
-                  fontSize: 13,
+                  fontSize: "13px",
                   fontWeight: 800,
                   letterSpacing: "2px",
                   color: palette.accent,
+                  textTransform: "uppercase",
                 }}
               >
-                CONTRIBUTION
-              </span>
+                Contribution
+              </div>
 
-              <span
+              <div
                 style={{
                   display: "flex",
-                  marginTop: "11px",
-                  fontSize: 20,
-                  lineHeight: 1.3,
+                  marginTop: "10px",
+                  fontSize: "19px",
                   fontWeight: 700,
-                  color: palette.cream,
+                  lineHeight: 1.3,
+                  color: palette.ink,
                 }}
               >
                 {contribution}
-              </span>
+              </div>
             </div>
 
             {/* Certificate metadata */}
             <div
               style={{
-                width: "390px",
                 display: "flex",
                 flexDirection: "column",
-                paddingLeft: "28px",
+                width: "390px",
+                minHeight: "150px",
+                padding: "18px 22px",
+                background: palette.white,
+                border: `2px solid ${palette.accentSoft}`,
                 justifyContent: "space-between",
               }}
             >
               <div
                 style={{
                   display: "flex",
+                  width: "100%",
                   justifyContent: "space-between",
+                  gap: "18px",
                 }}
               >
                 <div
@@ -381,29 +389,30 @@ export default async function OpenGraphImage({
                     flexDirection: "column",
                   }}
                 >
-                  <span
+                  <div
                     style={{
                       display: "flex",
-                      fontSize: 12,
+                      fontSize: "12px",
                       fontWeight: 800,
                       letterSpacing: "1.5px",
                       color: palette.accent,
+                      textTransform: "uppercase",
                     }}
                   >
-                    CERTIFICATE ID
-                  </span>
+                    Certificate ID
+                  </div>
 
-                  <span
+                  <div
                     style={{
                       display: "flex",
-                      marginTop: "7px",
-                      fontSize: 18,
+                      marginTop: "6px",
+                      fontSize: "17px",
                       fontWeight: 700,
-                      color: palette.cream,
+                      color: palette.ink,
                     }}
                   >
                     {certificate.certificateId}
-                  </span>
+                  </div>
                 </div>
 
                 <div
@@ -413,62 +422,41 @@ export default async function OpenGraphImage({
                     alignItems: "flex-end",
                   }}
                 >
-                  <span
+                  <div
                     style={{
                       display: "flex",
-                      fontSize: 12,
+                      fontSize: "12px",
                       fontWeight: 800,
                       letterSpacing: "1.5px",
                       color: palette.accent,
+                      textTransform: "uppercase",
                     }}
                   >
-                    ISSUE DATE
-                  </span>
+                    Issued on
+                  </div>
 
-                  <span
+                  <div
                     style={{
                       display: "flex",
-                      marginTop: "7px",
-                      fontSize: 17,
+                      marginTop: "6px",
+                      fontSize: "17px",
                       fontWeight: 700,
-                      color: palette.cream,
+                      color: palette.ink,
                     }}
                   >
-                    {issueDate}
-                  </span>
+                    {formatIssueDate(certificate.issueDate)}
+                  </div>
                 </div>
               </div>
 
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
+                  width: "100%",
+                  height: "1px",
+                  background: palette.accentSoft,
                 }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    fontSize: 12,
-                    fontWeight: 800,
-                    letterSpacing: "1.5px",
-                    color: palette.accent,
-                  }}
-                >
-                  DURATION
-                </span>
-
-                <span
-                  style={{
-                    display: "flex",
-                    marginTop: "7px",
-                    fontSize: 17,
-                    fontWeight: 700,
-                    color: palette.cream,
-                  }}
-                >
-                  {certificate.duration || "Not specified"}
-                </span>
-              </div>
+              />
 
               <div
                 style={{
@@ -476,69 +464,120 @@ export default async function OpenGraphImage({
                   flexDirection: "column",
                 }}
               >
-                <span
+                <div
                   style={{
                     display: "flex",
-                    fontSize: 12,
+                    fontSize: "12px",
                     fontWeight: 800,
                     letterSpacing: "1.5px",
                     color: palette.accent,
+                    textTransform: "uppercase",
                   }}
                 >
-                  SIGNED BY
-                </span>
+                  Duration
+                </div>
 
-                <span
+                <div
                   style={{
                     display: "flex",
-                    marginTop: "7px",
-                    fontSize: 17,
+                    marginTop: "6px",
+                    fontSize: "17px",
                     fontWeight: 700,
-                    color: palette.cream,
+                    color: palette.ink,
                   }}
                 >
-                  {issuedBy}
-                </span>
+                  {certificate.duration}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Bottom verification strip */}
+          {/* Footer */}
           <div
             style={{
               display: "flex",
               width: "100%",
-              alignItems: "center",
+              alignItems: "flex-end",
               justifyContent: "space-between",
-              marginTop: "auto",
-              paddingTop: "17px",
+              marginTop: "22px",
             }}
           >
-            <span
+            <div
               style={{
                 display: "flex",
-                fontSize: 14,
-                color: palette.muted,
+                flexDirection: "column",
+                maxWidth: "540px",
               }}
             >
-              Officially issued and verifiable through Lioran Group
-            </span>
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  letterSpacing: "1.8px",
+                  color: palette.accent,
+                  textTransform: "uppercase",
+                }}
+              >
+                Verification
+              </div>
 
-            <span
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: "5px",
+                  fontSize: "15px",
+                  color: palette.soft,
+                }}
+              >
+                Verify this certificate at lioran.group
+              </div>
+            </div>
+
+            <div
               style={{
                 display: "flex",
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: "1px",
-                color: palette.accent,
+                flexDirection: "column",
+                alignItems: "flex-end",
+                maxWidth: "470px",
               }}
             >
-              LIORAN.GROUP/VERIFY/{certificate.certificateId}
-            </span>
+              <div
+                style={{
+                  display: "flex",
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  letterSpacing: "1.8px",
+                  color: palette.accent,
+                  textTransform: "uppercase",
+                }}
+              >
+                Signed by
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: "5px",
+                  fontSize: "18px",
+                  fontWeight: 800,
+                  color: palette.ink,
+                  textAlign: "right",
+                }}
+              >
+                {issuedBy}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     ),
-    size,
+    {
+      width: 1200,
+      height: 630,
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    },
   );
 }
