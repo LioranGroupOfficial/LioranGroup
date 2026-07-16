@@ -406,6 +406,8 @@ button,
   background: transparent;
   gap: 8px;
   cursor: pointer;
+  width: auto;
+  max-width: 100%;
 }
 
 .nav-trigger-label,
@@ -413,6 +415,7 @@ button,
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .nav-icon {
@@ -448,9 +451,27 @@ button,
 }
 
 .nav-dropdown a {
+  display: flex;
   min-height: 42px;
   padding: 12px 14px;
   border-bottom: 1px solid rgba(148, 137, 121, 0.32);
+}
+
+.nav-dropdown .nav-link,
+.mobile-subnav .nav-link {
+  width: 100%;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.nav-dropdown .nav-link span,
+.mobile-subnav .nav-link span,
+.nav-trigger-label span {
+  min-width: 0;
+}
+
+.mobile-subnav {
+  display: none;
 }
 
 .nav-dropdown a:last-child {
@@ -594,11 +615,23 @@ button,
   .nav-group-trigger {
     width: 100%;
     justify-content: space-between;
+    overflow: hidden;
   }
 
   .nav-dropdown {
     position: static;
     margin-top: 8px;
     min-width: 100%;
+  }
+
+  .mobile-subnav {
+    display: grid;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(148, 137, 121, 0.32);
+  }
+
+  .subnav {
+    display: none;
   }
 }
