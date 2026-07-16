@@ -280,8 +280,8 @@ export default function CertificateViewer({ certificate }: Props) {
       color: palette.border,
     });
 
-    const detailsTop = height - 328;
-    const detailsBottom = 148;
+    const detailsTop = height - 308;
+    const detailsBottom = 182;
     const panelHeight = detailsTop - detailsBottom;
     const leftX = 82;
     const leftWidth = 392;
@@ -390,7 +390,7 @@ export default function CertificateViewer({ certificate }: Props) {
       color: palette.background,
     });
 
-    const footerY = 74;
+    const footerY = 34;
     const qrBoxX = 96;
     const qrBoxWidth = 246;
     const qrBoxHeight = 92;
@@ -462,7 +462,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
     page.drawImage(signatureImage, {
       x: signatureBoxX + 20,
-      y: footerY + 52,
+      y: footerY + 50,
       width: 132,
       height: 34,
     });
