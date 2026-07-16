@@ -1,33 +1,49 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import {
+  PDFDocument,
+  rgb,
+  StandardFonts,
+  type PDFFont,
+  type RGB,
+} from "pdf-lib";
 import QRCode from "qrcode";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function formatDate(value: Date) {
   return value.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 
 function randomId() {
-  return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+  return Math.floor(1_000_000_000 + Math.random() * 9_000_000_000).toString();
 }
 
 async function createTempCertificatePdf() {
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([842, 595]);
+  const page = pdfDoc.addPage([842, 630]);
+
   const { width, height } = page.getSize();
+
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+  const fontOblique = await pdfDoc.embedFont(
+    StandardFonts.HelveticaOblique,
+  );
 
   const certificateId = randomId();
+
   const issueDate = new Date("2026-07-16T00:00:00.000Z");
   const startDate = new Date("2025-12-15T00:00:00.000Z");
   const endDate = new Date("2026-01-16T00:00:00.000Z");
+
   const verifyUrl = `https://lioran.group/verify/${certificateId}`;
 
   const palette = {
@@ -44,10 +60,11 @@ async function createTempCertificatePdf() {
     text: string,
     y: number,
     size: number,
-    font: typeof fontRegular,
-    color: ReturnType<typeof rgb>,
+    font: PDFFont,
+    color: RGB,
   ) => {
     const textWidth = font.widthOfTextAtSize(text, size);
+
     page.drawText(text, {
       x: (width - textWidth) / 2,
       y,
@@ -72,12 +89,13 @@ async function createTempCertificatePdf() {
     y: number;
     maxWidth: number;
     size: number;
-    font: typeof fontRegular;
-    color: ReturnType<typeof rgb>;
+    font: PDFFont;
+    color: RGB;
     lineHeight: number;
   }) => {
     const words = text.split(/\s+/);
     const lines: string[] = [];
+
     let line = "";
 
     for (const word of words) {
@@ -86,12 +104,14 @@ async function createTempCertificatePdf() {
 
       if (candidateWidth <= maxWidth) {
         line = candidate;
-      } else {
-        if (line) {
-          lines.push(line);
-        }
-        line = word;
+        continue;
       }
+
+      if (line) {
+        lines.push(line);
+      }
+
+      line = word;
     }
 
     if (line) {
@@ -108,6 +128,7 @@ async function createTempCertificatePdf() {
         font,
         color,
       });
+
       cursorY -= lineHeight;
     }
 
@@ -147,65 +168,90 @@ async function createTempCertificatePdf() {
     });
   };
 
-  page.drawRectangle({
-    x: 0,
-    y: 0,
-    width,
-    height,
-    color: palette.paper,
-  });
+  /*
+   * ONE FILLED PAGE BOUNDARY
+   *
+   * The entire certificate is contained inside one solid rectangle.
+   * There are no additional nested page-boundary rectangles.
+   */
+  const boundaryMargin = 22;
 
   page.drawRectangle({
-    x: 22,
-    y: 22,
-    width: width - 44,
-    height: height - 44,
-    borderWidth: 1.4,
+    x: boundaryMargin,
+    y: boundaryMargin,
+    width: width - boundaryMargin * 2,
+    height: height - boundaryMargin * 2,
+    color: palette.panel,
+    borderWidth: 1.5,
     borderColor: palette.border,
   });
 
-  page.drawRectangle({
-    x: 38,
-    y: 38,
-    width: width - 76,
-    height: height - 76,
-    borderWidth: 0.8,
-    borderColor: palette.accentSoft,
-  });
+  /*
+   * HEADER
+   */
+  centerText(
+    "Certificate of Achievement",
+    height - 76,
+    30,
+    fontBold,
+    palette.ink,
+  );
 
-  page.drawRectangle({
-    x: 58,
-    y: 56,
-    width: width - 116,
-    height: height - 112,
-    color: palette.panel,
-    borderWidth: 0.8,
-    borderColor: palette.accentSoft,
-  });
-
-  centerText("Certificate of Achievement", height - 88, 30, fontBold, palette.ink);
   centerText(
     "This certificate is proudly presented to",
-    height - 124,
+    height - 112,
     15,
     fontRegular,
     palette.soft,
   );
-  centerText("Demo Recipient", height - 186, 30, fontBold, palette.ink);
-  centerText("Open Source Contributor", height - 226, 16, fontOblique, palette.accent);
+
+  centerText(
+    "Demo Recipient",
+    height - 166,
+    30,
+    fontBold,
+    palette.ink,
+  );
+
+  centerText(
+    "Open Source Contributor",
+    height - 204,
+    16,
+    fontOblique,
+    palette.accent,
+  );
 
   page.drawLine({
-    start: { x: 228, y: height - 250 },
-    end: { x: width - 228, y: height - 250 },
+    start: {
+      x: 228,
+      y: height - 228,
+    },
+    end: {
+      x: width - 228,
+      y: height - 228,
+    },
     thickness: 1,
     color: palette.border,
   });
 
-  const detailsTop = height - 302;
-  const detailsBottom = 184;
-  const panelHeight = detailsTop - detailsBottom;
+  /*
+   * DETAILS SECTION
+   *
+   * Increased container height substantially.
+   *
+   * Previous approximate height:
+   * 312 - 204 = 108px
+   *
+   * New height:
+   * 352 - 196 = 156px
+   */
+  const detailsTop = 352;
+  const detailsBottom = 196;
+  const detailsHeight = detailsTop - detailsBottom;
+
   const leftX = 88;
   const leftWidth = 390;
+
   const rightX = 510;
   const rightWidth = 196;
 
@@ -213,7 +259,8 @@ async function createTempCertificatePdf() {
     x: leftX - 14,
     y: detailsBottom,
     width: leftWidth + 28,
-    height: panelHeight,
+    height: detailsHeight,
+    color: palette.paper,
     borderWidth: 0.8,
     borderColor: palette.accentSoft,
   });
@@ -222,7 +269,8 @@ async function createTempCertificatePdf() {
     x: rightX - 14,
     y: detailsBottom,
     width: rightWidth + 28,
-    height: panelHeight,
+    height: detailsHeight,
+    color: palette.paper,
     borderWidth: 0.8,
     borderColor: palette.accentSoft,
   });
@@ -231,11 +279,11 @@ async function createTempCertificatePdf() {
     label: "Contribution",
     value: "Participated in Lioran Group open-source project",
     x: leftX,
-    y: detailsTop - 8,
+    y: detailsTop - 20,
     width: leftWidth,
   });
 
-  leftCursorY -= 10;
+  leftCursorY -= 16;
 
   drawLabelValue({
     label: "Description",
@@ -250,11 +298,11 @@ async function createTempCertificatePdf() {
     label: "Certificate ID",
     value: certificateId,
     x: rightX,
-    y: detailsTop - 8,
+    y: detailsTop - 20,
     width: rightWidth,
   });
 
-  rightCursorY -= 10;
+  rightCursorY -= 14;
 
   rightCursorY = drawLabelValue({
     label: "Duration",
@@ -264,7 +312,7 @@ async function createTempCertificatePdf() {
     width: rightWidth,
   });
 
-  rightCursorY -= 10;
+  rightCursorY -= 14;
 
   drawLabelValue({
     label: "Issued by",
@@ -274,22 +322,49 @@ async function createTempCertificatePdf() {
     width: rightWidth,
   });
 
+  /*
+   * QR CODE
+   */
   const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
     width: 160,
     margin: 1,
-    color: { dark: "#111111", light: "#f7f4ee" },
+    color: {
+      dark: "#111111",
+      light: "#f7f4ee",
+    },
   });
 
-  const qrBytes = await fetch(qrDataUrl).then((res) => res.arrayBuffer());
+  const qrBase64 = qrDataUrl.split(",")[1];
+
+  if (!qrBase64) {
+    throw new Error("Failed to generate QR code.");
+  }
+
+  const qrBytes = Buffer.from(qrBase64, "base64");
   const qrImage = await pdfDoc.embedPng(qrBytes);
-  const signaturePath = path.join(process.cwd(), "public", "signs", "cto.png");
+
+  /*
+   * SIGNATURE
+   */
+  const signaturePath = path.join(
+    process.cwd(),
+    "public",
+    "signs",
+    "cto.png",
+  );
+
   const signatureBytes = await readFile(signaturePath);
   const signatureImage = await pdfDoc.embedPng(signatureBytes);
 
-  const footerY = 34;
+  /*
+   * FOOTER
+   */
+  const footerY = 48;
+
   const qrBoxX = 102;
   const qrBoxWidth = 250;
-  const qrBoxHeight = 92;
+  const qrBoxHeight = 112;
+
   const signatureBoxWidth = 256;
   const signatureBoxX = width - 102 - signatureBoxWidth;
 
@@ -298,6 +373,7 @@ async function createTempCertificatePdf() {
     y: footerY,
     width: qrBoxWidth,
     height: qrBoxHeight,
+    color: palette.paper,
     borderWidth: 0.8,
     borderColor: palette.accentSoft,
   });
@@ -307,20 +383,21 @@ async function createTempCertificatePdf() {
     y: footerY,
     width: signatureBoxWidth,
     height: qrBoxHeight,
+    color: palette.paper,
     borderWidth: 0.8,
     borderColor: palette.accentSoft,
   });
 
   page.drawImage(qrImage, {
     x: qrBoxX + 14,
-    y: footerY + 12,
+    y: footerY + 22,
     width: 68,
     height: 68,
   });
 
   page.drawText("Verify authenticity", {
     x: qrBoxX + 96,
-    y: footerY + 58,
+    y: footerY + 72,
     size: 11,
     font: fontBold,
     color: palette.accent,
@@ -328,15 +405,23 @@ async function createTempCertificatePdf() {
 
   page.drawText("Scan to open the official", {
     x: qrBoxX + 96,
-    y: footerY + 39,
+    y: footerY + 51,
     size: 10,
     font: fontRegular,
     color: palette.soft,
   });
 
-  page.drawText("verification page on Lioran Group.", {
+  page.drawText("verification page on", {
     x: qrBoxX + 96,
-    y: footerY + 24,
+    y: footerY + 36,
+    size: 10,
+    font: fontRegular,
+    color: palette.soft,
+  });
+
+  page.drawText("Lioran Group.", {
+    x: qrBoxX + 96,
+    y: footerY + 21,
     size: 10,
     font: fontRegular,
     color: palette.soft,
@@ -344,14 +429,14 @@ async function createTempCertificatePdf() {
 
   page.drawImage(signatureImage, {
     x: signatureBoxX + 16,
-    y: footerY + 50,
+    y: footerY + 66,
     width: 134,
     height: 34,
   });
 
   page.drawText("Swaraj Puppalwar", {
     x: signatureBoxX + 16,
-    y: footerY + 34,
+    y: footerY + 48,
     size: 11.5,
     font: fontBold,
     color: palette.ink,
@@ -359,7 +444,7 @@ async function createTempCertificatePdf() {
 
   page.drawText("CTO, Lioran Group", {
     x: signatureBoxX + 16,
-    y: footerY + 18,
+    y: footerY + 31,
     size: 10.5,
     font: fontRegular,
     color: palette.soft,
@@ -367,7 +452,7 @@ async function createTempCertificatePdf() {
 
   page.drawText(`Issued on ${formatDate(issueDate)}`, {
     x: signatureBoxX + 16,
-    y: footerY + 5,
+    y: footerY + 14,
     size: 9.5,
     font: fontRegular,
     color: palette.accent,
@@ -377,14 +462,28 @@ async function createTempCertificatePdf() {
 }
 
 export async function GET() {
-  const pdfBytes = await createTempCertificatePdf();
+  try {
+    const pdfBytes = await createTempCertificatePdf();
 
-  return new NextResponse(Buffer.from(pdfBytes), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="temp-certificate.pdf"',
-      "Cache-Control": "no-store",
-    },
-  });
+    return new NextResponse(Buffer.from(pdfBytes), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition":
+          'attachment; filename="temp-certificate.pdf"',
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
+  } catch (error) {
+    console.error("Certificate PDF generation failed:", error);
+
+    return NextResponse.json(
+      {
+        error: "Failed to generate certificate PDF.",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
 }
