@@ -347,9 +347,9 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawRectangle({
         x: leftX - 12,
-        y: detailsBottom + 12,
+        y: detailsBottom,
         width: leftWidth + 24,
-        height: detailsHeight,
+        height: detailsHeight + 24,
         color: palette.panelSoft,
         borderWidth: 0.8,
         borderColor: palette.accentSoft,
@@ -357,9 +357,9 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawRectangle({
         x: rightX - 12,
-        y: detailsBottom + 12,
+        y: detailsBottom,
         width: rightWidth + 24,
-        height: detailsHeight,
+        height: detailsHeight + 24,
         color: palette.panelSoft,
         borderWidth: 0.8,
         borderColor: palette.accentSoft,
