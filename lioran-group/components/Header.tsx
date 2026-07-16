@@ -182,6 +182,7 @@ export default function Header() {
                           target="_blank"
                           rel="noreferrer"
                           className="nav-link"
+                          style={{ padding: "10px" }}
                           onClick={() => {
                             setOpenGroup(null);
                             setMobileOpen(false);
@@ -195,6 +196,7 @@ export default function Header() {
                           key={link.href}
                           href={link.href}
                           className="nav-link"
+                          style={{ padding: "10px" }}
                           data-active={isActive(pathname, link.href)}
                           onClick={() => {
                             setOpenGroup(null);
