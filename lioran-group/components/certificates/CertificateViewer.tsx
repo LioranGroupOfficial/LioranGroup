@@ -82,7 +82,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
   async function generatePdf() {
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([842, 680]);
+    const page = pdfDoc.addPage([842, 595]);
     const { width, height } = page.getSize();
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -90,8 +90,8 @@ export default function CertificateViewer({ certificate }: Props) {
 
     const palette = {
       background: rgb(0.08, 0.09, 0.11),
-      panel: rgb(0.12, 0.14, 0.17),
-      panelSoft: rgb(0.16, 0.18, 0.22),
+      panel: rgb(0.14, 0.16, 0.2),
+      panelSoft: rgb(0.18, 0.2, 0.25),
       border: rgb(0.61, 0.56, 0.46),
       text: rgb(0.98, 0.98, 0.97),
       textSoft: rgb(0.82, 0.83, 0.85),
@@ -189,12 +189,16 @@ export default function CertificateViewer({ certificate }: Props) {
       x,
       y,
       width: blockWidth,
+      size = 12,
+      lineHeight = 16,
     }: {
       label: string;
       value: string;
       x: number;
       y: number;
       width: number;
+      size?: number;
+      lineHeight?: number;
     }) => {
       page.drawText(label.toUpperCase(), {
         x,
@@ -207,12 +211,12 @@ export default function CertificateViewer({ certificate }: Props) {
       return drawWrappedText({
         text: value,
         x,
-        y: y - 18,
+        y: y - 20,
         maxWidth: blockWidth,
-        size: 12,
+        size,
         font: fontRegular,
         color: palette.text,
-        lineHeight: 16,
+        lineHeight,
       });
     };
 
@@ -225,28 +229,28 @@ export default function CertificateViewer({ certificate }: Props) {
     });
 
     page.drawRectangle({
-      x: 20,
-      y: 20,
-      width: width - 40,
-      height: height - 40,
+      x: 18,
+      y: 18,
+      width: width - 36,
+      height: height - 36,
       borderWidth: 1.2,
       borderColor: palette.border,
       color: palette.background,
     });
 
     page.drawRectangle({
-      x: 34,
-      y: 34,
-      width: width - 68,
-      height: height - 68,
+      x: 32,
+      y: 32,
+      width: width - 64,
+      height: height - 64,
       borderWidth: 0.6,
       borderColor: palette.accentSoft,
     });
 
-    const contentX = 56;
-    const contentY = 64;
-    const contentWidth = width - 112;
-    const contentHeight = height - 128;
+    const contentX = 54;
+    const contentY = 52;
+    const contentWidth = width - 108;
+    const contentHeight = height - 104;
 
     page.drawRectangle({
       x: contentX,
@@ -258,37 +262,36 @@ export default function CertificateViewer({ certificate }: Props) {
       borderColor: rgb(0.24, 0.26, 0.31),
     });
 
-    centerText("Certificate of Achievement", height - 108, 29, fontBold, palette.text);
+    centerText("Certificate of Achievement", height - 90, 29, fontBold, palette.text);
     centerText(
       "This certificate is proudly presented to",
-      height - 144,
+      height - 126,
       15,
       fontRegular,
       palette.textSoft,
     );
-    centerText(certificate.name, height - 206, 31, fontBold, palette.text);
-    centerText(certificate.role, height - 246, 16, fontOblique, palette.accent);
+    centerText(certificate.name, height - 188, 31, fontBold, palette.text);
+    centerText(certificate.role, height - 228, 16, fontOblique, palette.accent);
 
     page.drawLine({
-      start: { x: 220, y: height - 268 },
-      end: { x: width - 220, y: height - 268 },
+      start: { x: 230, y: height - 254 },
+      end: { x: width - 230, y: height - 254 },
       thickness: 1,
       color: palette.border,
     });
 
-    const detailsTop = height - 332;
-    const panelHeight = 206;
-    const gap = 22;
-    const leftX = 86;
-    const leftWidth = 410;
-    const rightX = leftX + leftWidth + gap + 28;
-    const rightWidth = 218;
-    const panelBottom = detailsTop - panelHeight;
+    const detailsTop = height - 328;
+    const detailsBottom = 148;
+    const panelHeight = detailsTop - detailsBottom;
+    const leftX = 82;
+    const leftWidth = 392;
+    const rightX = 508;
+    const rightWidth = 212;
 
     page.drawRectangle({
-      x: leftX - 18,
-      y: panelBottom,
-      width: leftWidth + 36,
+      x: leftX - 14,
+      y: detailsBottom,
+      width: leftWidth + 28,
       height: panelHeight,
       color: palette.panelSoft,
       borderWidth: 0.8,
@@ -296,9 +299,9 @@ export default function CertificateViewer({ certificate }: Props) {
     });
 
     page.drawRectangle({
-      x: rightX - 18,
-      y: panelBottom,
-      width: rightWidth + 36,
+      x: rightX - 14,
+      y: detailsBottom,
+      width: rightWidth + 28,
       height: panelHeight,
       color: palette.panelSoft,
       borderWidth: 0.8,
@@ -309,8 +312,10 @@ export default function CertificateViewer({ certificate }: Props) {
       label: "Contribution",
       value: certificate.contribution,
       x: leftX,
-      y: detailsTop,
+      y: detailsTop - 8,
       width: leftWidth,
+      size: 11,
+      lineHeight: 15,
     });
 
     leftCursorY -= 10;
@@ -321,17 +326,21 @@ export default function CertificateViewer({ certificate }: Props) {
       x: leftX,
       y: leftCursorY,
       width: leftWidth,
+      size: 11,
+      lineHeight: 14,
     });
 
     let rightCursorY = drawLabelValue({
       label: "Certificate ID",
       value: certificate.certificateId,
       x: rightX,
-      y: detailsTop,
+      y: detailsTop - 8,
       width: rightWidth,
+      size: 11,
+      lineHeight: 15,
     });
 
-    rightCursorY -= 10;
+    rightCursorY -= 8;
 
     rightCursorY = drawLabelValue({
       label: "Duration",
@@ -339,9 +348,11 @@ export default function CertificateViewer({ certificate }: Props) {
       x: rightX,
       y: rightCursorY,
       width: rightWidth,
+      size: 10.5,
+      lineHeight: 14,
     });
 
-    rightCursorY -= 10;
+    rightCursorY -= 8;
 
     rightCursorY = drawLabelValue({
       label: "Issued by",
@@ -349,9 +360,11 @@ export default function CertificateViewer({ certificate }: Props) {
       x: rightX,
       y: rightCursorY,
       width: rightWidth,
+      size: 10.5,
+      lineHeight: 14,
     });
 
-    rightCursorY -= 10;
+    rightCursorY -= 8;
 
     page.drawText("STATUS", {
       x: rightX,
@@ -363,51 +376,30 @@ export default function CertificateViewer({ certificate }: Props) {
 
     page.drawRectangle({
       x: rightX,
-      y: rightCursorY - 24,
-      width: 116,
+      y: rightCursorY - 22,
+      width: 118,
       height: 20,
       color: statusColor,
-      borderWidth: 0,
     });
 
     page.drawText(formatStatus(certificate.status).toUpperCase(), {
       x: rightX + 12,
-      y: rightCursorY - 18,
+      y: rightCursorY - 16,
       size: 10,
       font: fontBold,
       color: palette.background,
     });
 
-    const footerY = 84;
-    const footerHeight = 136;
-    const qrBoxX = 88;
-    const qrBoxY = footerY;
-    const qrBoxWidth = 258;
-    const signatureBoxWidth = 272;
-    const signatureBoxX = width - 88 - signatureBoxWidth;
-
-    page.drawRectangle({
-      x: qrBoxX,
-      y: qrBoxY,
-      width: qrBoxWidth,
-      height: footerHeight,
-      color: palette.panelSoft,
-      borderWidth: 0.8,
-      borderColor: rgb(0.27, 0.29, 0.34),
-    });
-
-    page.drawRectangle({
-      x: signatureBoxX,
-      y: qrBoxY,
-      width: signatureBoxWidth,
-      height: footerHeight,
-      color: palette.panelSoft,
-      borderWidth: 0.8,
-      borderColor: rgb(0.27, 0.29, 0.34),
-    });
+    const footerY = 74;
+    const qrBoxX = 96;
+    const qrBoxWidth = 246;
+    const qrBoxHeight = 92;
+    const signatureBoxWidth = 248;
+    const signatureBoxHeight = 92;
+    const signatureBoxX = width - 96 - signatureBoxWidth;
 
     const qrDataUrl = await QRCode.toDataURL(certificate.verificationUrl, {
-      width: 150,
+      width: 160,
       margin: 1,
       color: { dark: "#ffffff", light: "#1f2937" },
     });
@@ -417,64 +409,84 @@ export default function CertificateViewer({ certificate }: Props) {
     const signatureBytes = await convertSignatureToWhite("/signs/cto.png");
     const signatureImage = await pdfDoc.embedPng(signatureBytes);
 
+    page.drawRectangle({
+      x: qrBoxX,
+      y: footerY,
+      width: qrBoxWidth,
+      height: qrBoxHeight,
+      color: palette.panelSoft,
+      borderWidth: 0.8,
+      borderColor: rgb(0.27, 0.29, 0.34),
+    });
+
+    page.drawRectangle({
+      x: signatureBoxX,
+      y: footerY,
+      width: signatureBoxWidth,
+      height: signatureBoxHeight,
+      color: palette.panelSoft,
+      borderWidth: 0.8,
+      borderColor: rgb(0.27, 0.29, 0.34),
+    });
+
+    page.drawImage(qrImage, {
+      x: qrBoxX + 14,
+      y: footerY + 12,
+      width: 68,
+      height: 68,
+    });
+
     page.drawText("Verify authenticity", {
-      x: qrBoxX + 18,
-      y: qrBoxY + footerHeight - 28,
+      x: qrBoxX + 96,
+      y: footerY + 58,
       size: 11,
       font: fontBold,
       color: palette.accent,
     });
 
-    page.drawText("Scan the QR code to open the official", {
-      x: qrBoxX + 128,
-      y: qrBoxY + footerHeight - 48,
+    page.drawText("Scan to open the official", {
+      x: qrBoxX + 96,
+      y: footerY + 39,
       size: 10,
       font: fontRegular,
       color: palette.textSoft,
     });
 
-    page.drawText("verification record on Lioran Group.", {
-      x: qrBoxX + 128,
-      y: qrBoxY + footerHeight - 62,
+    page.drawText("verification page on Lioran Group.", {
+      x: qrBoxX + 96,
+      y: footerY + 24,
       size: 10,
       font: fontRegular,
       color: palette.textSoft,
-    });
-
-    page.drawImage(qrImage, {
-      x: qrBoxX + 18,
-      y: qrBoxY + 18,
-      width: 92,
-      height: 92,
     });
 
     page.drawImage(signatureImage, {
-      x: signatureBoxX + 24,
-      y: qrBoxY + 66,
-      width: 150,
-      height: 44,
+      x: signatureBoxX + 20,
+      y: footerY + 52,
+      width: 132,
+      height: 34,
     });
 
     page.drawText("Swaraj Puppalwar", {
-      x: signatureBoxX + 24,
-      y: qrBoxY + 48,
-      size: 14,
+      x: signatureBoxX + 20,
+      y: footerY + 34,
+      size: 11.5,
       font: fontBold,
       color: palette.text,
     });
 
     page.drawText("CTO, Lioran Group", {
-      x: signatureBoxX + 24,
-      y: qrBoxY + 30,
-      size: 12,
+      x: signatureBoxX + 20,
+      y: footerY + 18,
+      size: 10.5,
       font: fontRegular,
       color: palette.textSoft,
     });
 
     page.drawText(`Issued on ${formatDate(certificate.issueDate)}`, {
-      x: signatureBoxX + 24,
-      y: qrBoxY + 12,
-      size: 10,
+      x: signatureBoxX + 20,
+      y: footerY + 5,
+      size: 9.5,
       font: fontRegular,
       color: palette.accentSoft,
     });
