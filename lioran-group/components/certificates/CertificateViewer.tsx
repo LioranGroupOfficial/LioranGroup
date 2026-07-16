@@ -460,12 +460,13 @@ export default function CertificateViewer({ certificate }: Props) {
         94,
         statusTextWidth + 24,
       );
+      const statusBadgeHeight = 23;
 
       page.drawRectangle({
         x: rightX,
-        y: rightCursorY - 24,
+        y: rightCursorY - 27,
         width: statusBadgeWidth,
-        height: 19,
+        height: statusBadgeHeight,
         color: statusColor,
       });
 
@@ -473,7 +474,7 @@ export default function CertificateViewer({ certificate }: Props) {
         x:
           rightX +
           (statusBadgeWidth - statusTextWidth) / 2,
-        y: rightCursorY - 18,
+        y: rightCursorY - 19.5,
         size: 9.5,
         font: fontBold,
         color: palette.paper,
@@ -715,10 +716,11 @@ export default function CertificateViewer({ certificate }: Props) {
           style={{
             padding: 0,
             overflow: "hidden",
-            background: "#f8f5ed",
+            background: "#222831",
             border: "1px solid #948979",
             borderRadius: 4,
-            color: "#222831",
+            color: "#f8f5ed",
+            boxShadow: "0 24px 70px rgba(0, 0, 0, 0.28)",
           }}
         >
           <div
@@ -726,7 +728,8 @@ export default function CertificateViewer({ certificate }: Props) {
               position: "relative",
               padding: "52px 42px",
               overflow: "hidden",
-              background: "#eee9dd",
+              background:
+                "linear-gradient(135deg, #222831 0%, #2b313a 52%, #393e46 100%)",
             }}
           >
             <div
@@ -745,8 +748,8 @@ export default function CertificateViewer({ certificate }: Props) {
                 width={420}
                 height={420}
                 style={{
-                  opacity: 0.045,
-                  filter: "grayscale(1)",
+                  opacity: 0.055,
+                  filter: "grayscale(1) brightness(2)",
                 }}
               />
             </div>
@@ -769,7 +772,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   style={{
                     margin: 0,
                     fontSize: "clamp(2rem, 5vw, 3rem)",
-                    color: "#222831",
+                    color: "#f8f5ed",
                   }}
                 >
                   Certificate of Achievement
@@ -778,7 +781,7 @@ export default function CertificateViewer({ certificate }: Props) {
                 <p
                   style={{
                     margin: 0,
-                    color: "#5c5c66",
+                    color: "#c7c4bd",
                   }}
                 >
                   This certificate is proudly presented to
@@ -797,7 +800,7 @@ export default function CertificateViewer({ certificate }: Props) {
                     margin: 0,
                     fontSize: "clamp(2rem, 4vw, 2.75rem)",
                     fontWeight: 800,
-                    color: "#222831",
+                    color: "#f8f5ed",
                   }}
                 >
                   {certificate.name}
@@ -806,7 +809,7 @@ export default function CertificateViewer({ certificate }: Props) {
                 <p
                   style={{
                     margin: 0,
-                    color: "#948979",
+                    color: "#dfd0b8",
                     fontSize: "1.1rem",
                     fontStyle: "italic",
                   }}
@@ -814,6 +817,16 @@ export default function CertificateViewer({ certificate }: Props) {
                   {certificate.role}
                 </p>
               </div>
+
+              <div
+                style={{
+                  width: "min(360px, 75%)",
+                  height: 1,
+                  margin: "0 auto",
+                  background: "#948979",
+                  opacity: 0.85,
+                }}
+              />
 
               <div
                 style={{
@@ -827,8 +840,8 @@ export default function CertificateViewer({ certificate }: Props) {
                   style={{
                     minHeight: 140,
                     padding: 22,
-                    background: "#f8f5ed",
-                    border: "1px solid #c9bca4",
+                    background: "rgba(57, 62, 70, 0.78)",
+                    border: "1px solid rgba(148, 137, 121, 0.62)",
                     borderRadius: 4,
                     display: "grid",
                     alignContent: "start",
@@ -838,7 +851,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   <p
                     style={{
                       margin: 0,
-                      color: "#948979",
+                      color: "#dfd0b8",
                       fontSize: 12,
                       fontWeight: 800,
                       letterSpacing: "0.08em",
@@ -848,7 +861,13 @@ export default function CertificateViewer({ certificate }: Props) {
                     Contribution
                   </p>
 
-                  <p style={{ margin: 0 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#f1eee8",
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {certificate.contribution}
                   </p>
                 </article>
@@ -857,8 +876,8 @@ export default function CertificateViewer({ certificate }: Props) {
                   style={{
                     minHeight: 140,
                     padding: 22,
-                    background: "#f8f5ed",
-                    border: "1px solid #c9bca4",
+                    background: "rgba(57, 62, 70, 0.78)",
+                    border: "1px solid rgba(148, 137, 121, 0.62)",
                     borderRadius: 4,
                     display: "grid",
                     alignContent: "start",
@@ -868,7 +887,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   <p
                     style={{
                       margin: 0,
-                      color: "#948979",
+                      color: "#dfd0b8",
                       fontSize: 12,
                       fontWeight: 800,
                       letterSpacing: "0.08em",
@@ -878,7 +897,13 @@ export default function CertificateViewer({ certificate }: Props) {
                     Description
                   </p>
 
-                  <p style={{ margin: 0 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#f1eee8",
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {certificate.description}
                   </p>
                 </article>
@@ -887,8 +912,8 @@ export default function CertificateViewer({ certificate }: Props) {
                   style={{
                     minHeight: 120,
                     padding: 22,
-                    background: "#f8f5ed",
-                    border: "1px solid #c9bca4",
+                    background: "rgba(57, 62, 70, 0.78)",
+                    border: "1px solid rgba(148, 137, 121, 0.62)",
                     borderRadius: 4,
                     display: "grid",
                     alignContent: "start",
@@ -898,7 +923,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   <p
                     style={{
                       margin: 0,
-                      color: "#948979",
+                      color: "#dfd0b8",
                       fontSize: 12,
                       fontWeight: 800,
                       letterSpacing: "0.08em",
@@ -908,7 +933,13 @@ export default function CertificateViewer({ certificate }: Props) {
                     Duration
                   </p>
 
-                  <p style={{ margin: 0 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#f1eee8",
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {certificate.duration} from{" "}
                     {formatDate(certificate.startDate)} to{" "}
                     {formatDate(certificate.endDate)}
@@ -919,8 +950,8 @@ export default function CertificateViewer({ certificate }: Props) {
                   style={{
                     minHeight: 120,
                     padding: 22,
-                    background: "#f8f5ed",
-                    border: "1px solid #c9bca4",
+                    background: "rgba(57, 62, 70, 0.78)",
+                    border: "1px solid rgba(148, 137, 121, 0.62)",
                     borderRadius: 4,
                     display: "grid",
                     alignContent: "start",
@@ -930,7 +961,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   <p
                     style={{
                       margin: 0,
-                      color: "#948979",
+                      color: "#dfd0b8",
                       fontSize: 12,
                       fontWeight: 800,
                       letterSpacing: "0.08em",
@@ -940,7 +971,13 @@ export default function CertificateViewer({ certificate }: Props) {
                     Issued
                   </p>
 
-                  <p style={{ margin: 0 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#f1eee8",
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {certificate.issuedBy} on{" "}
                     {formatDate(certificate.issueDate)}
                   </p>
@@ -959,8 +996,8 @@ export default function CertificateViewer({ certificate }: Props) {
                 <div
                   style={{
                     padding: 20,
-                    background: "#f8f5ed",
-                    border: "1px solid #c9bca4",
+                    background: "rgba(57, 62, 70, 0.78)",
+                    border: "1px solid rgba(148, 137, 121, 0.62)",
                     borderRadius: 4,
                     display: "grid",
                     gap: 14,
@@ -970,6 +1007,7 @@ export default function CertificateViewer({ certificate }: Props) {
                     style={{
                       margin: 0,
                       fontWeight: 700,
+                      color: "#f8f5ed",
                     }}
                   >
                     Verification QR
@@ -978,13 +1016,18 @@ export default function CertificateViewer({ certificate }: Props) {
                   <QRCodeCanvas
                     value={certificate.verificationUrl}
                     size={160}
-                    bgColor="#f8f5ed"
-                    fgColor="#222831"
+                    bgColor="#393e46"
+                    fgColor="#f8f5ed"
                     level="H"
                   />
                 </div>
 
-                <div style={{ textAlign: "right" }}>
+                <div
+                  style={{
+                    textAlign: "right",
+                    padding: "12px 0",
+                  }}
+                >
                   <Image
                     src="/signs/cto.png"
                     alt="CTO signature"
@@ -992,6 +1035,7 @@ export default function CertificateViewer({ certificate }: Props) {
                     height={56}
                     style={{
                       objectFit: "contain",
+                      filter: "invert(1) brightness(1.45)",
                     }}
                   />
 
@@ -999,7 +1043,7 @@ export default function CertificateViewer({ certificate }: Props) {
                     style={{
                       margin: 0,
                       fontWeight: 700,
-                      color: "#222831",
+                      color: "#f8f5ed",
                     }}
                   >
                     Swaraj Puppalwar
@@ -1008,7 +1052,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   <p
                     style={{
                       margin: 0,
-                      color: "#5c5c66",
+                      color: "#c7c4bd",
                     }}
                   >
                     CTO, Lioran Group
@@ -1017,7 +1061,7 @@ export default function CertificateViewer({ certificate }: Props) {
                   <p
                     style={{
                       margin: "4px 0 0",
-                      color: "#948979",
+                      color: "#dfd0b8",
                       fontSize: "0.9rem",
                     }}
                   >
