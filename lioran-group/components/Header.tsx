@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import {
   BriefcaseBusiness,
   Building2,
@@ -101,8 +101,10 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    setOpenGroup(null);
-    setMobileOpen(false);
+    startTransition(() => {
+      setOpenGroup(null);
+      setMobileOpen(false);
+    });
   }, [pathname]);
 
   return (

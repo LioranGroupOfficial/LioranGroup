@@ -1,21 +1,17 @@
-import { use } from "react";
+import Link from "next/link";
+import { connectDB } from "@/app/lib/mongodb";
+import { getCertificateById } from "@/app/lib/certificates";
 
 interface Certificate {
   certificateId: string;
   name: string;
+  role: string;
+  status: string;
 }
 
 async function getCertificate(id: string): Promise<Certificate | null> {
-  try {
-    const res = await fetch(`https://lioran.group/api/certificates/${id}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.data || null;
-  } catch {
-    return null;
-  }
+  await connectDB();
+  return getCertificateById(id);
 }
 
 export default async function VerifyCertificatePage({
@@ -28,22 +24,43 @@ export default async function VerifyCertificatePage({
   const certificate = await getCertificate(id);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white p-6">
-      <div className="bg-gray-800 p-10 rounded-3xl shadow-lg text-center max-w-md">
+    <div
+      className="page-shell page-grid"
+      style={{ minHeight: "70vh", alignContent: "center" }}
+    >
+      <div className="card" style={{ maxWidth: 620, margin: "0 auto", textAlign: "center" }}>
         {certificate ? (
           <>
-            <h1 className="text-3xl font-bold mb-4">Certificate Verified ✅</h1>
-            <p className="text-gray-300 mb-2">
+            <h1 style={{ margin: 0, fontSize: "2rem" }}>
+              {certificate.status === "active"
+                ? "Certificate Verified"
+                : "Certificate Found"}
+            </h1>
+            <p style={{ margin: 0 }}>
               <strong>ID:</strong> {certificate.certificateId}
             </p>
-            <p className="text-gray-300">
+            <p style={{ margin: 0 }}>
               <strong>Name:</strong> {certificate.name}
             </p>
+            <p style={{ margin: 0 }}>
+              <strong>Role:</strong> {certificate.role}
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong>Status:</strong> {certificate.status}
+            </p>
+            <div className="button-row" style={{ justifyContent: "center" }}>
+              <Link
+                href={`/certificate/view/${certificate.certificateId}`}
+                className="button-primary"
+              >
+                Open Certificate
+              </Link>
+            </div>
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-bold mb-4">Certificate Not Found ❌</h1>
-            <p className="text-gray-400">
+            <h1 style={{ margin: 0, fontSize: "2rem" }}>Certificate Not Found</h1>
+            <p style={{ margin: 0 }}>
               The certificate with ID <strong>{id}</strong> is invalid or does not exist.
             </p>
           </>

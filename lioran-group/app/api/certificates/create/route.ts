@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "../../../lib/mongodb";
-import Certificate from "../../../models/Certificate";
-
-const generateCertificateId = (): string => {
-  return Math.floor(1000000000 + Math.random() * 9000000000).toString();
-};
+import { createCertificate } from "../../../lib/certificates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,54 +15,8 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const {
-      name,
-      role,
-      contribution,
-      description,
-      startDate,
-      endDate,
-      duration,
-    } = body;
-
-    if (
-      !name ||
-      !role ||
-      !contribution ||
-      !description ||
-      !startDate ||
-      !endDate ||
-      !duration
-    ) {
-      return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
     await connectDB();
-
-    let certificateId = "";
-    let exists = true;
-
-    while (exists) {
-      certificateId = generateCertificateId();
-      exists = !!(await Certificate.exists({ certificateId }));
-    }
-
-    const verificationUrl = `https://lioran.group/verify/${certificateId}`;
-
-    const certificate = await Certificate.create({
-      certificateId,
-      name,
-      role,
-      contribution,
-      description,
-      startDate,
-      endDate,
-      duration,
-      verificationUrl,
-    });
+    const certificate = await createCertificate(body);
 
     return NextResponse.json(
       {
@@ -77,10 +27,12 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error(error);
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
+
     return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
-      { status: 500 }
+      { success: false, message },
+      { status: message === "Internal Server Error" ? 500 : 400 }
     );
   }
 }

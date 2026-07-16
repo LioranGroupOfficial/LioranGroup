@@ -68,7 +68,7 @@ const CertificateSchema = new Schema<ICertificate>(
 
     status: {
       type: String,
-      enum: ["active", "revoked"],
+      enum: ["active", "suspended", "revoked"],
       default: "active",
     },
   },
