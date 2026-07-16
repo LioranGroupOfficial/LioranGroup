@@ -82,7 +82,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
   async function generatePdf() {
     const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([842, 595]);
+    const page = pdfDoc.addPage([842, 680]);
     const { width, height } = page.getSize();
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -243,39 +243,53 @@ export default function CertificateViewer({ certificate }: Props) {
       borderColor: palette.accentSoft,
     });
 
+    const contentX = 56;
+    const contentY = 64;
+    const contentWidth = width - 112;
+    const contentHeight = height - 128;
+
     page.drawRectangle({
-      x: 56,
-      y: 70,
-      width: width - 112,
-      height: height - 140,
+      x: contentX,
+      y: contentY,
+      width: contentWidth,
+      height: contentHeight,
       color: palette.panel,
       borderWidth: 1,
       borderColor: rgb(0.24, 0.26, 0.31),
     });
 
-    centerText("Certificate of Achievement", height - 92, 29, fontBold, palette.text);
-    centerText("This certificate is proudly presented to", height - 124, 15, fontRegular, palette.textSoft);
-    centerText(certificate.name, height - 174, 31, fontBold, palette.text);
-    centerText(certificate.role, height - 207, 16, fontOblique, palette.accent);
+    centerText("Certificate of Achievement", height - 108, 29, fontBold, palette.text);
+    centerText(
+      "This certificate is proudly presented to",
+      height - 144,
+      15,
+      fontRegular,
+      palette.textSoft,
+    );
+    centerText(certificate.name, height - 206, 31, fontBold, palette.text);
+    centerText(certificate.role, height - 246, 16, fontOblique, palette.accent);
 
     page.drawLine({
-      start: { x: 248, y: height - 222 },
-      end: { x: width - 248, y: height - 222 },
+      start: { x: 220, y: height - 268 },
+      end: { x: width - 220, y: height - 268 },
       thickness: 1,
       color: palette.border,
     });
 
-    const descriptionTop = 324;
+    const detailsTop = height - 332;
+    const panelHeight = 206;
+    const gap = 22;
     const leftX = 86;
-    const leftWidth = 390;
-    const rightX = 510;
-    const rightWidth = 245;
+    const leftWidth = 410;
+    const rightX = leftX + leftWidth + gap + 28;
+    const rightWidth = 218;
+    const panelBottom = detailsTop - panelHeight;
 
     page.drawRectangle({
       x: leftX - 18,
-      y: 146,
+      y: panelBottom,
       width: leftWidth + 36,
-      height: 178,
+      height: panelHeight,
       color: palette.panelSoft,
       borderWidth: 0.8,
       borderColor: rgb(0.27, 0.29, 0.34),
@@ -283,9 +297,9 @@ export default function CertificateViewer({ certificate }: Props) {
 
     page.drawRectangle({
       x: rightX - 18,
-      y: 146,
+      y: panelBottom,
       width: rightWidth + 36,
-      height: 178,
+      height: panelHeight,
       color: palette.panelSoft,
       borderWidth: 0.8,
       borderColor: rgb(0.27, 0.29, 0.34),
@@ -295,7 +309,7 @@ export default function CertificateViewer({ certificate }: Props) {
       label: "Contribution",
       value: certificate.contribution,
       x: leftX,
-      y: descriptionTop,
+      y: detailsTop,
       width: leftWidth,
     });
 
@@ -313,7 +327,7 @@ export default function CertificateViewer({ certificate }: Props) {
       label: "Certificate ID",
       value: certificate.certificateId,
       x: rightX,
-      y: descriptionTop,
+      y: detailsTop,
       width: rightWidth,
     });
 
@@ -364,6 +378,34 @@ export default function CertificateViewer({ certificate }: Props) {
       color: palette.background,
     });
 
+    const footerY = 84;
+    const footerHeight = 136;
+    const qrBoxX = 88;
+    const qrBoxY = footerY;
+    const qrBoxWidth = 258;
+    const signatureBoxWidth = 272;
+    const signatureBoxX = width - 88 - signatureBoxWidth;
+
+    page.drawRectangle({
+      x: qrBoxX,
+      y: qrBoxY,
+      width: qrBoxWidth,
+      height: footerHeight,
+      color: palette.panelSoft,
+      borderWidth: 0.8,
+      borderColor: rgb(0.27, 0.29, 0.34),
+    });
+
+    page.drawRectangle({
+      x: signatureBoxX,
+      y: qrBoxY,
+      width: signatureBoxWidth,
+      height: footerHeight,
+      color: palette.panelSoft,
+      borderWidth: 0.8,
+      borderColor: rgb(0.27, 0.29, 0.34),
+    });
+
     const qrDataUrl = await QRCode.toDataURL(certificate.verificationUrl, {
       width: 150,
       margin: 1,
@@ -376,62 +418,62 @@ export default function CertificateViewer({ certificate }: Props) {
     const signatureImage = await pdfDoc.embedPng(signatureBytes);
 
     page.drawText("Verify authenticity", {
-      x: 88,
-      y: 126,
+      x: qrBoxX + 18,
+      y: qrBoxY + footerHeight - 28,
       size: 11,
       font: fontBold,
       color: palette.accent,
     });
 
     page.drawText("Scan the QR code to open the official", {
-      x: 88,
-      y: 110,
+      x: qrBoxX + 128,
+      y: qrBoxY + footerHeight - 48,
       size: 10,
       font: fontRegular,
       color: palette.textSoft,
     });
 
     page.drawText("verification record on Lioran Group.", {
-      x: 88,
-      y: 96,
+      x: qrBoxX + 128,
+      y: qrBoxY + footerHeight - 62,
       size: 10,
       font: fontRegular,
       color: palette.textSoft,
     });
 
     page.drawImage(qrImage, {
-      x: 88,
-      y: 148,
+      x: qrBoxX + 18,
+      y: qrBoxY + 18,
       width: 92,
       height: 92,
     });
 
     page.drawImage(signatureImage, {
-      x: width - 244,
-      y: 132,
-      width: 146,
-      height: 46,
+      x: signatureBoxX + 24,
+      y: qrBoxY + 66,
+      width: 150,
+      height: 44,
     });
 
     page.drawText("Swaraj Puppalwar", {
-      x: width - 240,
-      y: 116,
+      x: signatureBoxX + 24,
+      y: qrBoxY + 48,
       size: 14,
       font: fontBold,
       color: palette.text,
     });
 
     page.drawText("CTO, Lioran Group", {
-      x: width - 240,
-      y: 98,
+      x: signatureBoxX + 24,
+      y: qrBoxY + 30,
       size: 12,
       font: fontRegular,
       color: palette.textSoft,
     });
 
     page.drawText(`Issued on ${formatDate(certificate.issueDate)}`, {
-      x: width - 240,
-      y: 80,
+      x: signatureBoxX + 24,
+      y: qrBoxY + 12,
       size: 10,
       font: fontRegular,
       color: palette.accentSoft,
