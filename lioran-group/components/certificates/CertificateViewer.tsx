@@ -165,6 +165,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
         for (const word of words) {
           const candidate = line ? `${line} ${word}` : word;
+
           const candidateWidth = font.widthOfTextAtSize(
             candidate,
             size,
@@ -196,7 +197,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
           while (
             font.widthOfTextAtSize(`${lastLine}...`, size) >
-              maxWidth &&
+            maxWidth &&
             lastLine.length > 0
           ) {
             lastLine = lastLine.slice(0, -1);
@@ -263,9 +264,7 @@ export default function CertificateViewer({ certificate }: Props) {
       };
 
       /*
-       * ONE FILLED OUTER BOUNDARY
-       *
-       * No extra nested page borders.
+       * One filled outer certificate boundary.
        */
       const boundaryMargin = 20;
 
@@ -328,15 +327,15 @@ export default function CertificateViewer({ certificate }: Props) {
       });
 
       /*
-       * LARGE DETAILS SECTION
+       * Details section.
        *
-       * Height:
-       * 352 - 183 = 169 points
+       * Bottom changed from 183 to 158.
+       * Panel height changed from 169 to 194.
        *
-       * This is significantly taller than the previous version.
+       * This gives the status badge enough vertical room.
        */
       const detailsTop = 352;
-      const detailsBottom = 183;
+      const detailsBottom = 158;
       const detailsHeight = detailsTop - detailsBottom;
 
       const leftX = 72;
@@ -389,7 +388,7 @@ export default function CertificateViewer({ certificate }: Props) {
         width: leftWidth,
         size: 10.5,
         lineHeight: 13.5,
-        maxLines: 5,
+        maxLines: 6,
       });
 
       /*
@@ -451,31 +450,38 @@ export default function CertificateViewer({ certificate }: Props) {
         certificate.status,
       ).toUpperCase();
 
+      const statusTextSize = 9.5;
+
       const statusTextWidth = fontBold.widthOfTextAtSize(
         statusText,
-        9.5,
+        statusTextSize,
       );
 
       const statusBadgeWidth = Math.max(
         94,
         statusTextWidth + 24,
       );
+
       const statusBadgeHeight = 23;
+      const statusBadgeY = rightCursorY - 28;
 
       page.drawRectangle({
         x: rightX,
-        y: rightCursorY - 27,
+        y: statusBadgeY,
         width: statusBadgeWidth,
         height: statusBadgeHeight,
         color: statusColor,
       });
 
+      /*
+       * Vertically center status text inside the badge.
+       */
       page.drawText(statusText, {
         x:
           rightX +
           (statusBadgeWidth - statusTextWidth) / 2,
-        y: rightCursorY - 19.5,
-        size: 9.5,
+        y: statusBadgeY + 7,
+        size: statusTextSize,
         font: fontBold,
         color: palette.paper,
       });
@@ -512,9 +518,12 @@ export default function CertificateViewer({ certificate }: Props) {
 
       /*
        * Footer boxes.
+       *
+       * Footer moved from y 43 to y 32.
+       * This preserves spacing below the taller detail panels.
        */
-      const footerY = 43;
-      const footerHeight = 103;
+      const footerY = 32;
+      const footerHeight = 104;
 
       const qrBoxX = 88;
       const qrBoxWidth = 272;
@@ -555,7 +564,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawText("Verify authenticity", {
         x: qrBoxX + 100,
-        y: footerY + 67,
+        y: footerY + 68,
         size: 11,
         font: fontBold,
         color: palette.accent,
@@ -563,7 +572,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawText("Scan to open the official", {
         x: qrBoxX + 100,
-        y: footerY + 47,
+        y: footerY + 48,
         size: 9.7,
         font: fontRegular,
         color: palette.soft,
@@ -571,7 +580,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawText("certificate verification page", {
         x: qrBoxX + 100,
-        y: footerY + 32,
+        y: footerY + 33,
         size: 9.7,
         font: fontRegular,
         color: palette.soft,
@@ -579,7 +588,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawText("on Lioran Group.", {
         x: qrBoxX + 100,
-        y: footerY + 17,
+        y: footerY + 18,
         size: 9.7,
         font: fontRegular,
         color: palette.soft,
@@ -590,14 +599,14 @@ export default function CertificateViewer({ certificate }: Props) {
        */
       page.drawImage(signatureImage, {
         x: signatureBoxX + 18,
-        y: footerY + 58,
+        y: footerY + 59,
         width: 138,
         height: 34,
       });
 
       page.drawText("Swaraj Puppalwar", {
         x: signatureBoxX + 18,
-        y: footerY + 42,
+        y: footerY + 43,
         size: 11.5,
         font: fontBold,
         color: palette.ink,
@@ -605,7 +614,7 @@ export default function CertificateViewer({ certificate }: Props) {
 
       page.drawText("CTO, Lioran Group", {
         x: signatureBoxX + 18,
-        y: footerY + 26,
+        y: footerY + 27,
         size: 10.2,
         font: fontRegular,
         color: palette.soft,
@@ -615,7 +624,7 @@ export default function CertificateViewer({ certificate }: Props) {
         `Issued on ${formatDate(certificate.issueDate)}`,
         {
           x: signatureBoxX + 18,
-          y: footerY + 11,
+          y: footerY + 12,
           size: 9.3,
           font: fontRegular,
           color: palette.accent,
