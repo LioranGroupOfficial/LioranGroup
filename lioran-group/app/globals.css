@@ -945,6 +945,10 @@ select {
   .site-footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .subnav {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -966,6 +970,10 @@ select {
   .three-column,
   .site-footer-grid {
     grid-template-columns: 1fr;
+  }
+
+  .subnav {
+    display: none;
   }
 
   .nav-toggle {

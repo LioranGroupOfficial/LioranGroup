@@ -208,21 +208,30 @@ export default function Header() {
           })}
 
           <div className="mobile-subnav">
-            {companyLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="nav-link"
-                data-active={isActive(pathname, item.href)}
-                onClick={() => {
-                  setOpenGroup(null);
-                  setMobileOpen(false);
-                }}
-              >
-                <Building2 className="nav-icon" />
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {companyLinks.map((item) => {
+              const SubIcon =
+                item.href === "/companies/future"
+                  ? Compass
+                  : item.href === "/products"
+                  ? Package
+                  : Building2;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="nav-link"
+                  data-active={isActive(pathname, item.href)}
+                  onClick={() => {
+                    setOpenGroup(null);
+                    setMobileOpen(false);
+                  }}
+                >
+                  <SubIcon className="nav-icon" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </nav>
 
