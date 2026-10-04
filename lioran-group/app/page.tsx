@@ -5,9 +5,10 @@ import {
   CircleHelp,
   Compass,
   Database,
+  ExternalLink,
   FileCode2,
   Flag,
-  Layers3,
+  HardDrive,
   ShieldCheck,
   Terminal,
 } from "lucide-react";
@@ -27,8 +28,8 @@ const architectureRows = [
   ],
   [
     "Product layer",
-    "LioranDB",
-    "Database product under LDS focused on predictable infrastructure behavior.",
+    "LioranDB & Lioran S3",
+    "Database and object storage products under LDS focused on predictable infrastructure behavior.",
   ],
 ];
 
@@ -42,12 +43,12 @@ const faqRows = [
     "Lioran Developer Solutions is a deep-tech infra company focused on reducing dependency on foreign dev infra and supporting data staying in India.",
   ],
   [
-    "Why only one theme?",
-    "The brand is intentionally dark, stable, and consistent across every product surface.",
+    "What is Lioran S3 / Bastion?",
+    "Lioran Bastion (Lioran S3) is a self-hosted Rust object storage engine with RocksDB metadata, launched on 1st Oct 2026 at liorans3.sbs (v1 Pre-Alpha). The next Alpha release is set for 29th Oct 2026.",
   ],
   [
     "Where do I start?",
-    "Start with LDS, then inspect LioranDB and the future product pipeline under it.",
+    "Start with LDS, then inspect LioranDB, Lioran S3, and the future product pipeline under it.",
   ],
 ];
 
@@ -114,7 +115,7 @@ export default function HomePage() {
               {"    "}name: <span className="text-[#34d399]">&quot;LDS&quot;</span>,{"\n"}
               {"    "}domain: <span className="text-[#38bdf8]">&quot;lioransolutions.com&quot;</span>,{"\n"}
               {"    "}focus: [<span className="text-[#34d399]">&quot;deep tech&quot;</span>, <span className="text-[#34d399]">&quot;developer infra&quot;</span>, <span className="text-[#34d399]">&quot;data sovereignty&quot;</span>],{"\n"}
-              {"    "}products: [<span className="text-[#34d399]">&quot;LioranDB&quot;</span>, <span className="text-[#34d399]">&quot;Lioran Bastion&quot;</span>, <span className="text-[#34d399]">&quot;Lioran Auth&quot;</span>]{"\n"}
+              {"    "}products: [<span className="text-[#34d399]">&quot;LioranDB&quot;</span>, <span className="text-[#34d399]">&quot;Lioran S3 (Bastion)&quot;</span>, <span className="text-[#34d399]">&quot;Lioran Auth&quot;</span>]{"\n"}
               {"  "}&#125;];{"\n"}
               {"  "}principles: [&#123;{"\n"}
               {"    "}<span className="text-[#34d399]">&quot;minimal interfaces&quot;</span>,{"\n"}
@@ -133,43 +134,59 @@ export default function HomePage() {
           <span className="caption-uppercase text-[var(--muted)]">Portfolio</span>
           <h2 className="display-md">Products</h2>
           <p>
-            Product direction under LDS, including the current database product
-            and the next infrastructure surfaces in the pipeline.
+            Product direction under LDS, including database and object storage systems
+            in active release and identity infrastructure in the pipeline.
           </p>
         </div>
         <div className="card-grid two-column">
-          {products.map((product) => (
-            <article key={product.name} className="card flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="badge-pill">{product.status}</span>
-                  <span className="text-xs font-mono text-[var(--muted)]">{product.domain}</span>
+          {products.map((product) => {
+            const isExternal = product.href.startsWith("http");
+
+            return (
+              <article key={product.name} className="card flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="badge-pill">{product.status}</span>
+                    <span className="text-xs font-mono text-[var(--muted)]">{product.domain}</span>
+                  </div>
+                  <CardTitle
+                    as="h3"
+                    icon={
+                      product.name.includes("LioranDB")
+                        ? Database
+                        : product.name.includes("Bastion") || product.name.includes("S3")
+                          ? HardDrive
+                          : ShieldCheck
+                    }
+                  >
+                    {product.name}
+                  </CardTitle>
+                  <p className="card-copy">{product.summary}</p>
+                  <p className="text-xs text-[var(--muted)] font-mono">
+                    {product.owner}
+                  </p>
                 </div>
-                <CardTitle
-                  as="h3"
-                  icon={
-                    product.name === "LioranDB"
-                      ? Database
-                      : product.name === "Lioran Bastion"
-                        ? Layers3
-                        : ShieldCheck
-                  }
-                >
-                  {product.name}
-                </CardTitle>
-                <p className="card-copy">{product.summary}</p>
-                <p className="text-xs text-[var(--muted)] font-mono">
-                  {product.owner}
-                </p>
-              </div>
-              <div className="pt-4 border-t border-[var(--hairline)] mt-2">
-                <Link href={product.href} className="button-link font-medium">
-                  <span>View details</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </article>
-          ))}
+                <div className="pt-4 border-t border-[var(--hairline)] mt-2">
+                  {isExternal ? (
+                    <a
+                      href={product.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="button-link font-medium"
+                    >
+                      <span>Open {product.domain}</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <Link href={product.href} className="button-link font-medium">
+                      <span>View details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -252,11 +269,11 @@ export default function HomePage() {
           <ul className="plain-list space-y-3 pt-2">
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink)] mt-2 flex-shrink-0" />
-              <span>LioranDB is the current flagship product under LDS.</span>
+              <span>LioranDB is the active flagship document database under LDS.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink)] mt-2 flex-shrink-0" />
-              <span>Lioran Bastion is planned as storage infrastructure similar to S3.</span>
+              <span>Lioran S3 (Bastion) launched v1 Pre-Alpha on 1st Oct 2026 (Alpha on 29th Oct).</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--ink)] mt-2 flex-shrink-0" />

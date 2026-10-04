@@ -15,6 +15,8 @@ export type ProductItem = {
 export const siteVersion = "v1.0";
 export const discordUrl = "https://discord.gg/WsWWThjPMp";
 export const githubUrl = "https://github.com/LioranGroupOfficial";
+export const lioranS3Url = "https://liorans3.sbs";
+export const lioranS3DocsUrl = "https://docs.liorans3.sbs";
 
 export const primaryNav: NavItem[] = [
   { href: "/", label: "Home" },
@@ -31,6 +33,7 @@ export const ecosystemLinks = [
   { name: "Lioran Group", href: "https://lioran.group" },
   { name: "LDS", href: "https://lioransolutions.com" },
   { name: "LioranDB", href: "https://liorandb.com" },
+  { name: "Lioran S3", href: lioranS3Url },
   { name: "GitHub", href: githubUrl },
   { name: "Discord", href: discordUrl },
 ];
@@ -46,13 +49,13 @@ export const products: ProductItem[] = [
       "A database product under LDS focused on predictable performance, operational clarity, and infrastructure-grade reliability.",
   },
   {
-    name: "Lioran Bastion",
-    href: "/companies/future",
-    domain: "lioransolutions.com",
-    status: "Future product",
-    owner: "Planned under LDS",
+    name: "Lioran Bastion (Lioran S3)",
+    href: lioranS3Url,
+    domain: "liorans3.sbs",
+    status: "v1 Pre-Alpha",
+    owner: "Built under LDS",
     summary:
-      "Storage infrastructure similar in direction to S3, planned to reduce dependency on foreign storage platforms.",
+      "Self-hosted Rust-based object storage engine with RocksDB metadata, signed URLs, and FFmpeg media processing. Launched 1st Oct 2026 as v1 Pre-Alpha; next Alpha release planned for 29th Oct 2026.",
   },
   {
     name: "Lioran Auth",
@@ -79,6 +82,7 @@ export const footerSections = [
       { href: "/companies/lcs", label: "LDS" },
       { href: "/products", label: "LDS Products" },
       { href: "/companies/lcs/products", label: "LioranDB" },
+      { href: lioranS3Url, label: "Lioran S3 (Bastion)" },
       { href: "/companies/future", label: "Future Products" },
       { href: "/roadmap", label: "Roadmap" },
       { href: "/changelog", label: "Changelog" },

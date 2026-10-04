@@ -1,7 +1,9 @@
 const services = [
   ["lioran.group", "Operational", "Public group website and ecosystem index."],
-  ["lioransolutions.com", "Planned", "LDS domain and public engineering surface."],
+  ["liorans3.sbs", "Operational", "Lioran S3 (Bastion) v1 Pre-Alpha object storage surface."],
+  ["docs.liorans3.sbs", "Operational", "Official documentation and developer guides for Lioran S3."],
   ["liorandb.com", "Planned", "Public product domain for LioranDB."],
+  ["lioransolutions.com", "Planned", "LDS domain and public engineering surface."],
 ];
 
 export default function StatusPage() {
@@ -27,8 +29,8 @@ export default function StatusPage() {
         <tbody>
           {services.map(([service, status, notes]) => (
             <tr key={service}>
-              <td>{service}</td>
-              <td>{status}</td>
+              <td className="font-mono text-sm">{service}</td>
+              <td className="font-medium text-[var(--ink)]">{status}</td>
               <td>{notes}</td>
             </tr>
           ))}

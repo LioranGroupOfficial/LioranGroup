@@ -15,7 +15,7 @@ const companies = [
     href: "/companies/future",
     label: "Pipeline under LDS",
     summary:
-      "Future infrastructure products under LDS, including Lioran Bastion and Lioran Auth.",
+      "Active and pipeline infrastructure products under LDS, including LioranDB, Lioran S3 (Bastion), and Lioran Auth.",
   },
 ];
 
