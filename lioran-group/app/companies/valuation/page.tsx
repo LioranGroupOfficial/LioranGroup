@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Info } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Company Valuation | Lioran Group",
@@ -99,6 +100,22 @@ export default function ValuationPage() {
           })}
         </tbody>
       </table>
+
+      <aside className="card p-6 border border-[var(--hairline-strong)] bg-[var(--surface-strong)]">
+        <div className="flex items-center gap-2">
+          <Info className="w-4 h-4 text-[var(--ink)] flex-shrink-0" />
+          <span className="caption-uppercase text-[var(--ink)] font-semibold">
+            Valuation Disclaimer
+          </span>
+        </div>
+        <p className="card-copy text-sm leading-relaxed text-[var(--body)] pt-1">
+          ₹30 lakh represents an internal, non-independent estimate based primarily on
+          developed technology, intellectual property, digital assets, and current product
+          maturity. Lioran Group is presently pre-revenue and pre-traction. This estimate does
+          not represent a financing transaction, independent valuation, fair market value, or
+          guaranteed sale price.
+        </p>
+      </aside>
     </div>
   );
 }
