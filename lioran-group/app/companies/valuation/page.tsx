@@ -3,35 +3,26 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Company Valuation | Lioran Group",
   description:
-    "Current valuation, total shares, per-share value, and founder equity distribution of Lioran Group.",
+    "Pre-revenue valuation, total shares, per-share value, and founder equity distribution of Lioran Group.",
 };
 
 const valuationData = {
-  totalValuation: 7_337,
+  totalValuation: 3_000_000,
+  valuationStage: "Pre-Revenue",
   totalShares: 3_000_000,
   founders: [
     {
       name: "Swaraj Puppalwar",
-      role: "Co-Founder & CTO",
-      equity: 34,
-    },
-    {
-      name: "Shreyash Raipure",
-      role: "Co-Founder, CEO & CFO",
-      equity: 33,
-    },
-    {
-      name: "Pranay Kumeriya",
-      role: "Co-Founder & COO",
-      equity: 33,
+      role: "Founder & CTO",
+      equity: 100,
     },
   ],
 };
 
 function formatINR(value: number): string {
-  if (value >= 1e7) return `Rs ${(value / 1e7).toFixed(2)}C`;
-  if (value >= 1e5) return `Rs ${(value / 1e5).toFixed(2)}L`;
-  if (value >= 1e3) return `Rs ${(value / 1e3).toFixed(2)}K`;
+  if (value >= 1e7) return `Rs ${(value / 1e7).toFixed(2)} Cr`;
+  if (value >= 1e5) return `Rs ${(value / 1e5).toFixed(2)} Lakh`;
+  if (value >= 1e3) return `Rs ${(value / 1e3).toFixed(2)} K`;
   return `Rs ${value.toFixed(2)}`;
 }
 
@@ -45,7 +36,7 @@ export default function ValuationPage() {
         <span className="eyebrow">Valuation</span>
         <h1>Company valuation snapshot</h1>
         <p>
-          Internal reference view for current valuation, share count, and
+          Internal reference view for pre-revenue valuation, share count, and
           founder equity distribution.
         </p>
       </section>
@@ -53,22 +44,28 @@ export default function ValuationPage() {
       <table className="data-table">
         <thead>
           <tr>
-            <th>Metric</th>
-            <th>Value</th>
+            <th style={{ width: "50%" }}>Metric</th>
+            <th style={{ width: "50%" }}>Value</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Total Company Valuation</td>
-            <td>{formatINR(valuationData.totalValuation)}</td>
+            <td className="font-semibold text-[var(--ink)]">
+              {formatINR(valuationData.totalValuation)} (Pre-Revenue)
+            </td>
+          </tr>
+          <tr>
+            <td>Valuation Stage</td>
+            <td>{valuationData.valuationStage}</td>
           </tr>
           <tr>
             <td>Total Shares</td>
-            <td>{valuationData.totalShares.toLocaleString()} shares</td>
+            <td className="font-mono">{valuationData.totalShares.toLocaleString()} shares</td>
           </tr>
           <tr>
             <td>Value per Share</td>
-            <td>{formatINR(valuePerShare)}</td>
+            <td className="font-mono">{formatINR(valuePerShare)}</td>
           </tr>
         </tbody>
       </table>
@@ -92,11 +89,11 @@ export default function ValuationPage() {
 
             return (
               <tr key={founder.name}>
-                <td>{founder.name}</td>
+                <td className="font-semibold text-[var(--ink)]">{founder.name}</td>
                 <td>{founder.role}</td>
-                <td>{founder.equity}%</td>
-                <td>{sharesOwned.toLocaleString()}</td>
-                <td>{formatINR(shareValue)}</td>
+                <td className="font-mono">{founder.equity}%</td>
+                <td className="font-mono">{sharesOwned.toLocaleString()}</td>
+                <td className="font-mono text-[var(--ink)]">{formatINR(shareValue)}</td>
               </tr>
             );
           })}
