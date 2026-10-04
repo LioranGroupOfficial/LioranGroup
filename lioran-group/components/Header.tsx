@@ -12,11 +12,14 @@ import {
   House,
   Info,
   Mail,
+  Menu,
   Package,
   UserRound,
   Users,
+  X,
 } from "lucide-react";
 import { companyLinks, discordUrl } from "@/app/lib/site";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type NavGroup = {
   id: string;
@@ -114,16 +117,6 @@ export default function Header() {
           <Link href="/" onClick={() => setOpenGroup(null)}>
             Lioran Group
           </Link>
-
-          <button
-            type="button"
-            className="nav-toggle"
-            aria-expanded={mobileOpen}
-            aria-controls="site-nav"
-            onClick={() => setMobileOpen((state) => !state)}
-          >
-            Menu
-          </button>
         </div>
 
         <nav
@@ -184,7 +177,6 @@ export default function Header() {
                           target="_blank"
                           rel="noreferrer"
                           className="nav-link"
-                          style={{ padding: "10px" }}
                           onClick={() => {
                             setOpenGroup(null);
                             setMobileOpen(false);
@@ -198,7 +190,6 @@ export default function Header() {
                           key={link.href}
                           href={link.href}
                           className="nav-link"
-                          style={{ padding: "10px" }}
                           data-active={isActive(pathname, link.href)}
                           onClick={() => {
                             setOpenGroup(null);
@@ -235,21 +226,36 @@ export default function Header() {
           </div>
         </nav>
 
-        <nav className="subnav" aria-label="Ecosystem">
-          {companyLinks.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              data-active={isActive(pathname, item.href)}
-              onClick={() => {
-                setOpenGroup(null);
-                setMobileOpen(false);
-              }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex items-center gap-3">
+          <nav className="subnav" aria-label="Ecosystem">
+            {companyLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                data-active={isActive(pathname, item.href)}
+                onClick={() => {
+                  setOpenGroup(null);
+                  setMobileOpen(false);
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <ThemeToggle />
+
+          <button
+            type="button"
+            className="nav-toggle"
+            aria-expanded={mobileOpen}
+            aria-controls="site-nav"
+            onClick={() => setMobileOpen((state) => !state)}
+            aria-label="Toggle navigation"
+          >
+            {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
     </header>
   );

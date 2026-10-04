@@ -1,4 +1,4 @@
-import { Award, BriefcaseBusiness, GraduationCap, Mail, SearchCheck } from "lucide-react";
+import { GraduationCap, Mail, SearchCheck } from "lucide-react";
 import CardTitle from "@/components/CardTitle";
 
 const roles = [

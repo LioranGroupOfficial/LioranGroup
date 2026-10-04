@@ -79,147 +79,157 @@ const buildScopes = [
 
 export default function LwsPage() {
   return (
-    <section className="overflow-hidden bg-black">
-      <div className="mx-auto flex max-w-7xl flex-col gap-20 px-6 py-16">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-          <div className="space-y-8">
-            <div className="inline-flex rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1 text-sm text-cyan-200">
-              LWS · Lioran Web Solutions
-            </div>
+    <div className="page-shell page-grid">
+      {/* HERO */}
+      <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+        <div className="space-y-6">
+          <span className="eyebrow">
+            LWS · Lioran Web Solutions
+          </span>
 
-            <div className="space-y-5">
-              <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Managed web systems and SaaS product builds for teams that need
-                both infrastructure and execution.
-              </h1>
-              <p className="max-w-3xl text-base leading-7 text-slate-300 sm:text-lg">
-                LWS is the web solutions arm inside Lioran Group. We offer
-                hosted platform services like PostgreSQL, n8n, MinIO, and
-                Supertokens, while also designing and developing CRM systems,
-                sign systems, and full SaaS products through our agency model.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/lws/invest"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-              >
-                Start investment plan
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-700 px-6 py-3 text-sm font-semibold text-white transition hover:border-slate-500 hover:bg-slate-900"
-              >
-                Talk to our team
-              </Link>
-            </div>
+          <div className="space-y-4">
+            <h1 className="display-xl">
+              Managed web systems and SaaS product builds for teams that need
+              both infrastructure and execution.
+            </h1>
+            <p className="text-[var(--body)] text-lg leading-relaxed">
+              LWS is the web solutions arm inside Lioran Group. We offer
+              hosted platform services like PostgreSQL, n8n, MinIO, and
+              Supertokens, while also designing and developing CRM systems,
+              sign systems, and full SaaS products through our agency model.
+            </p>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.24),_transparent_42%),linear-gradient(180deg,_rgba(15,23,42,0.96),_rgba(2,6,23,0.98))] p-7 shadow-[0_30px_120px_rgba(6,182,212,0.12)]">
-            <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/80">
-              What we handle
-            </p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {[
-                "Infrastructure setup",
-                "Automation orchestration",
-                "Identity and access",
-                "CRM workflow design",
-                "SaaS product delivery",
-                "Post-launch support",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-200"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-5">
-              <p className="text-sm text-cyan-100">
-                Best fit for founders, growing teams, and businesses that want
-                a single partner for product engineering and managed stack
-                delivery.
-              </p>
-            </div>
+          <div className="button-row pt-2">
+            <Link
+              href="/lws/invest"
+              className="button-primary"
+            >
+              <span>Start investment plan</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/contact"
+              className="button-secondary"
+            >
+              Talk to our team
+            </Link>
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="card p-7 space-y-6 border border-[var(--hairline-strong)]">
+          <span className="caption-uppercase text-[var(--muted)]">
+            What we handle
+          </span>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              "Infrastructure setup",
+              "Automation orchestration",
+              "Identity and access",
+              "CRM workflow design",
+              "SaaS product delivery",
+              "Post-launch support",
+            ].map((item) => (
+              <div
+                key={item}
+                className="p-3 rounded-md border border-[var(--hairline)] bg-[var(--surface-strong)] text-sm font-medium text-[var(--ink)]"
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+          <div className="p-4 rounded-md border border-[var(--hairline)] bg-[var(--canvas-soft)]">
+            <p className="text-sm text-[var(--body)]">
+              Best fit for founders, growing teams, and businesses that want
+              a single partner for product engineering and managed stack
+              delivery.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES */}
+      <section className="section-block">
+        <div className="section-heading">
+          <span className="caption-uppercase text-[var(--muted)]">Platform Stack</span>
+          <h2 className="display-md">Managed Services</h2>
+          <p>Production infrastructure and integrations maintained by our engineering team.</p>
+        </div>
+        <div className="card-grid three-column">
           {services.map(({ name, description, icon: Icon }) => (
             <article
               key={name}
-              className="rounded-[1.75rem] border border-slate-800 bg-slate-950/70 p-6 transition hover:border-cyan-500/40 hover:bg-slate-950"
+              className="card"
             >
-              <div className="mb-5 inline-flex rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-3 text-cyan-300">
-                <Icon className="h-5 w-5" />
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-md bg-[var(--surface-strong)] text-[var(--ink)]">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <h3 className="title-md">{name}</h3>
               </div>
-              <h2 className="text-xl font-semibold text-white">{name}</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-400">
+              <p className="card-copy mt-2">
                 {description}
               </p>
             </article>
           ))}
         </div>
+      </section>
 
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[2rem] border border-slate-800 bg-slate-950 p-8">
-            <p className="text-sm uppercase tracking-[0.28em] text-cyan-300/80">
-              Delivery model
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold text-white">
-              We can act as your managed stack partner, product agency, or both.
-            </h2>
-            <div className="mt-6 space-y-4">
-              {deliveryTracks.map((track) => (
-                <div
-                  key={track}
-                  className="rounded-2xl border border-slate-800 bg-black/40 px-4 py-4 text-sm leading-6 text-slate-300"
-                >
-                  {track}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-slate-800 bg-[linear-gradient(180deg,_rgba(15,23,42,0.84),_rgba(3,7,18,0.95))] p-8">
-            <p className="text-sm uppercase tracking-[0.28em] text-cyan-300/80">
-              Common builds
-            </p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {buildScopes.map((scope) => (
-                <div
-                  key={scope}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-200"
-                >
-                  {scope}
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-medium text-white">
-                  Need a working budget before talking to us?
-                </h3>
-                <p className="mt-1 text-sm text-slate-300">
-                  Use our investment page to estimate services, timeline, and
-                  total project range.
-                </p>
-              </div>
-              <Link
-                href="/lws/invest"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-200 transition hover:text-white"
+      {/* DELIVERY MODEL & COMMON BUILDS */}
+      <section className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="card p-8 space-y-6">
+          <span className="caption-uppercase text-[var(--muted)]">
+            Delivery model
+          </span>
+          <h2 className="display-sm">
+            We can act as your managed stack partner, product agency, or both.
+          </h2>
+          <div className="space-y-3">
+            {deliveryTracks.map((track) => (
+              <div
+                key={track}
+                className="p-3.5 rounded-md border border-[var(--hairline)] bg-[var(--surface-strong)] text-sm leading-relaxed text-[var(--body)]"
               >
-                Open estimator
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+                {track}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-    </section>
+
+        <div className="card p-8 space-y-6">
+          <span className="caption-uppercase text-[var(--muted)]">
+            Common builds
+          </span>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {buildScopes.map((scope) => (
+              <div
+                key={scope}
+                className="p-3.5 rounded-md border border-[var(--hairline)] bg-[var(--surface-strong)] text-sm text-[var(--ink)]"
+              >
+                {scope}
+              </div>
+            ))}
+          </div>
+          <div className="p-5 rounded-md border border-[var(--hairline-strong)] bg-[var(--canvas-soft)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--ink)]">
+                Need a working budget before talking to us?
+              </h3>
+              <p className="text-xs text-[var(--body)] mt-1">
+                Use our investment page to estimate services, timeline, and
+                total project range.
+              </p>
+            </div>
+            <Link
+              href="/lws/invest"
+              className="button-primary text-xs"
+            >
+              <span>Open estimator</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

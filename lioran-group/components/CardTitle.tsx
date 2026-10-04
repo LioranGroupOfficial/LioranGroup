@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 type CardTitleProps = {
   icon: LucideIcon;
   children: React.ReactNode;
-  as?: "h2" | "h3";
+  as?: "h2" | "h3" | "h4";
 };
 
 export default function CardTitle({

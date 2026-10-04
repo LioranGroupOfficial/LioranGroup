@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 type ProjectType = "landing" | "portal" | "saas" | "internal" | "automation";
 type Timeline = "standard" | "fast" | "urgent";
@@ -122,83 +123,83 @@ export default function InvestmentPlanner() {
     <div className="grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
       <form
         onSubmit={handleSubmit}
-        className="rounded-[2rem] border border-slate-800 bg-slate-950/80 p-6 sm:p-8"
+        className="card p-6 sm:p-8"
       >
-        <div className="grid gap-6 md:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">First name</span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">First name</span>
             <input
               required
               value={form.firstName}
               onChange={(event) => handleChange("firstName", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input"
               placeholder="Aarav"
             />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">Last name</span>
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">Last name</span>
             <input
               required
               value={form.lastName}
               onChange={(event) => handleChange("lastName", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input"
               placeholder="Sharma"
             />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">Email</span>
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">Email</span>
             <input
               required
               type="email"
               value={form.email}
               onChange={(event) => handleChange("email", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input"
               placeholder="team@company.com"
             />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">Company</span>
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">Company</span>
             <input
               value={form.company}
               onChange={(event) => handleChange("company", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input"
               placeholder="Northwind Labs"
             />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">Role</span>
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">Role</span>
             <input
               value={form.role}
               onChange={(event) => handleChange("role", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input"
               placeholder="Founder / Ops / Product"
             />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">Region</span>
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">Region</span>
             <input
               value={form.region}
               onChange={(event) => handleChange("region", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input"
               placeholder="India, UAE, Europe..."
             />
           </label>
         </div>
 
-        <div className="mt-8 grid gap-6">
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">What do you want to build?</span>
+        <div className="mt-6 grid gap-5">
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">What do you want to build?</span>
             <select
               value={form.projectType}
               onChange={(event) =>
                 handleChange("projectType", event.target.value as ProjectType)
               }
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-input site-select"
             >
               <option value="landing">Marketing site or landing funnel</option>
               <option value="portal">Portal, dashboard, or client workspace</option>
@@ -208,23 +209,23 @@ export default function InvestmentPlanner() {
             </select>
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm text-slate-300">Project summary</span>
+          <label className="space-y-1.5">
+            <span className="text-xs font-medium text-[var(--body)]">Project summary</span>
             <textarea
               required
-              rows={5}
+              rows={4}
               value={form.buildSummary}
               onChange={(event) => handleChange("buildSummary", event.target.value)}
-              className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+              className="site-textarea"
               placeholder="Tell us what the product should do, who it serves, and which workflow is most critical."
             />
           </label>
 
-          <div className="space-y-3">
-            <span className="text-sm text-slate-300">
+          <div className="space-y-2">
+            <span className="text-xs font-medium text-[var(--body)]">
               Choose managed services and systems
             </span>
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               {serviceCatalog.map((service) => {
                 const active = form.services.includes(service.id);
 
@@ -233,14 +234,14 @@ export default function InvestmentPlanner() {
                     key={service.id}
                     type="button"
                     onClick={() => toggleService(service.id)}
-                    className={`rounded-2xl border px-4 py-4 text-left transition ${
+                    className={`p-3 rounded-md border text-left transition ${
                       active
-                        ? "border-cyan-400 bg-cyan-500/10 text-white"
-                        : "border-slate-700 bg-black text-slate-300 hover:border-slate-500"
+                        ? "border-[var(--ink)] bg-[var(--surface-strong)] text-[var(--ink)] font-medium"
+                        : "border-[var(--hairline-strong)] bg-[var(--surface-card)] text-[var(--body)] hover:border-[var(--muted)]"
                     }`}
                   >
-                    <div className="font-medium">{service.label}</div>
-                    <div className="mt-1 text-sm text-slate-400">
+                    <div className="text-sm font-medium">{service.label}</div>
+                    <div className="mt-0.5 text-xs text-[var(--muted)] font-mono">
                       {formatCurrency(service.price)}
                     </div>
                   </button>
@@ -249,23 +250,23 @@ export default function InvestmentPlanner() {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <label className="space-y-2">
-              <span className="text-sm text-slate-300">Expected users or seats</span>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-[var(--body)]">Expected users or seats</span>
               <input
                 value={form.users}
                 onChange={(event) => handleChange("users", event.target.value)}
-                className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                className="site-input"
                 placeholder="250 staff, 5k customers..."
               />
             </label>
 
-            <label className="space-y-2">
-              <span className="text-sm text-slate-300">Budget comfort zone</span>
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-[var(--body)]">Budget comfort zone</span>
               <select
                 value={form.budgetBand}
                 onChange={(event) => handleChange("budgetBand", event.target.value)}
-                className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                className="site-input site-select"
               >
                 <option>Below INR 2L</option>
                 <option>INR 2L - 5L</option>
@@ -275,14 +276,14 @@ export default function InvestmentPlanner() {
               </select>
             </label>
 
-            <label className="space-y-2">
-              <span className="text-sm text-slate-300">Timeline</span>
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-[var(--body)]">Timeline</span>
               <select
                 value={form.timeline}
                 onChange={(event) =>
                   handleChange("timeline", event.target.value as Timeline)
                 }
-                className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                className="site-input site-select"
               >
                 <option value="standard">Standard delivery</option>
                 <option value="fast">Fast-track</option>
@@ -290,14 +291,14 @@ export default function InvestmentPlanner() {
               </select>
             </label>
 
-            <label className="space-y-2">
-              <span className="text-sm text-slate-300">Support model</span>
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-[var(--body)]">Support model</span>
               <select
                 value={form.support}
                 onChange={(event) =>
                   handleChange("support", event.target.value as Support)
                 }
-                className="w-full rounded-2xl border border-slate-700 bg-black px-4 py-3 text-white outline-none transition focus:border-cyan-400"
+                className="site-input site-select"
               >
                 <option value="starter">Starter maintenance</option>
                 <option value="growth">Growth support</option>
@@ -307,94 +308,98 @@ export default function InvestmentPlanner() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 border-t border-slate-800 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm leading-6 text-slate-400">
+        <div className="mt-8 flex flex-col gap-4 border-t border-[var(--hairline)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-[var(--body)] max-w-sm">
             This submission creates a scoped estimate and lead brief. A final
             commercial proposal would still depend on exact requirements.
           </p>
           <button
             type="submit"
-            className="rounded-2xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="button-primary"
           >
-            Submit investment brief
+            <span>Submit investment brief</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </form>
 
       <aside className="space-y-6">
-        <div className="rounded-[2rem] border border-cyan-500/20 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),_transparent_48%),linear-gradient(180deg,_rgba(15,23,42,0.96),_rgba(2,6,23,0.98))] p-6 sm:p-8">
-          <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/80">
+        <div className="card p-6 border border-[var(--hairline-strong)] bg-[var(--surface-card)]">
+          <span className="caption-uppercase text-[var(--muted)]">
             Live estimate
-          </p>
-          <h2 className="mt-4 text-3xl font-semibold text-white">
+          </span>
+          <h2 className="display-sm mt-2 text-[var(--ink)] font-mono">
             {formatCurrency(estimatedTotal)}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
+          <p className="text-xs text-[var(--body)] mt-1">
             Indicative total based on build type, selected services, support
             model, and launch urgency.
           </p>
 
-          <div className="mt-6 space-y-3 text-sm">
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-300">
+          <div className="mt-5 space-y-2 text-sm">
+            <div className="flex items-center justify-between p-2.5 rounded-md bg-[var(--surface-strong)] text-[var(--body)]">
               <span>Base build</span>
-              <span>{formatCurrency(baseProjectPrice)}</span>
+              <span className="font-mono text-[var(--ink)]">{formatCurrency(baseProjectPrice)}</span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-300">
+            <div className="flex items-center justify-between p-2.5 rounded-md bg-[var(--surface-strong)] text-[var(--body)]">
               <span>Selected services</span>
-              <span>{formatCurrency(servicePrice)}</span>
+              <span className="font-mono text-[var(--ink)]">{formatCurrency(servicePrice)}</span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-300">
+            <div className="flex items-center justify-between p-2.5 rounded-md bg-[var(--surface-strong)] text-[var(--body)]">
               <span>Support</span>
-              <span>{formatCurrency(supportPrice)}</span>
+              <span className="font-mono text-[var(--ink)]">{formatCurrency(supportPrice)}</span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 font-medium text-white">
+            <div className="flex items-center justify-between p-2.5 rounded-md border border-[var(--hairline-strong)] bg-[var(--canvas-soft)] font-medium text-[var(--ink)]">
               <span>Estimated deposit</span>
-              <span>{formatCurrency(estimatedDeposit)}</span>
+              <span className="font-mono">{formatCurrency(estimatedDeposit)}</span>
             </div>
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-slate-800 bg-slate-950 p-6 sm:p-8">
-          <h3 className="text-lg font-semibold text-white">Current scope</h3>
-          <div className="mt-4 flex flex-wrap gap-2">
+        <div className="card p-6 border border-[var(--hairline-strong)]">
+          <h3 className="title-sm">Current scope</h3>
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {selectedServices.length > 0 ? (
               selectedServices.map((service) => (
                 <span
                   key={service.id}
-                  className="rounded-full border border-slate-700 bg-black px-3 py-1 text-sm text-slate-300"
+                  className="badge-pill"
                 >
                   {service.label}
                 </span>
               ))
             ) : (
-              <span className="text-sm text-slate-500">
+              <span className="text-xs text-[var(--muted)]">
                 Select services to improve your estimate.
               </span>
             )}
           </div>
 
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-black/40 p-4">
-            <p className="text-sm text-slate-400">Budget band</p>
-            <p className="mt-1 text-white">{form.budgetBand}</p>
+          <div className="mt-4 p-3 rounded-md bg-[var(--surface-strong)] border border-[var(--hairline)]">
+            <p className="text-xs text-[var(--muted)]">Budget band</p>
+            <p className="mt-0.5 text-sm font-medium text-[var(--ink)]">{form.budgetBand}</p>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-slate-800 bg-black/40 p-4">
-            <p className="text-sm text-slate-400">Contact summary</p>
-            <p className="mt-1 text-white">
+          <div className="mt-2 p-3 rounded-md bg-[var(--surface-strong)] border border-[var(--hairline)]">
+            <p className="text-xs text-[var(--muted)]">Contact summary</p>
+            <p className="mt-0.5 text-sm font-medium text-[var(--ink)]">
               {[form.firstName, form.lastName].filter(Boolean).join(" ") || "Your name"}
             </p>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="text-xs text-[var(--muted)] font-mono">
               {form.email || "email@example.com"}
             </p>
           </div>
         </div>
 
         {submitted ? (
-          <div className="rounded-[2rem] border border-emerald-500/30 bg-emerald-500/10 p-6 sm:p-8">
-            <h3 className="text-lg font-semibold text-white">
-              Investment brief prepared
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-200">
+          <div className="card p-6 border border-[#16a34a]/30 bg-[#16a34a]/10">
+            <div className="flex items-center gap-2 text-[#16a34a]">
+              <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+              <h3 className="title-sm text-[#16a34a]">
+                Investment brief prepared
+              </h3>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--body)]">
               Thanks {form.firstName || "there"}, your project details and
               estimate are now structured for a follow-up proposal. Connect this
               form to your preferred API or CRM later if you want actual lead

@@ -16,9 +16,9 @@ type ApiResponse = {
 };
 
 const statusTone: Record<CertificateStatus, string> = {
-  active: "#86efac",
-  suspended: "#fcd34d",
-  revoked: "#fca5a5",
+  active: "var(--semantic-success)",
+  suspended: "var(--accent-warning)",
+  revoked: "var(--semantic-error)",
 };
 
 export default function AdminCertificateManager() {

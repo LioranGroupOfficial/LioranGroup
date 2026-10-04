@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowRight, CheckCircle2, Layers3, Network, ShieldCheck, Terminal } from "lucide-react";
 
 export default function PageClient() {
   const [form, setForm] = useState({
@@ -11,7 +12,7 @@ export default function PageClient() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,41 +28,42 @@ export default function PageClient() {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message);
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      setMsg("✅ You are now registered for LDEP Beta access.");
+      setMsg({ type: "success", text: "You are now registered for LDEP Beta access." });
       setForm({
         firstName: "",
         lastName: "",
         email: "",
         updates: true,
       });
-    } catch (err: any) {
-      setMsg("❌ " + err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Registration error";
+      setMsg({ type: "error", text: errorMessage });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <div className="page-shell page-grid">
       {/* HERO + FORM */}
-      <section className="max-w-7xl mx-auto px-6 py-28 grid lg:grid-cols-2 gap-20 items-center">
-
+      <section className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-start">
         {/* Left Content */}
-        <div>
-          <h1 className="text-6xl font-bold tracking-tight">
+        <div className="flex flex-col gap-6">
+          <span className="eyebrow">Developer Platform</span>
+          <h1 className="display-xl">
             LDEP
           </h1>
 
-          <p className="mt-6 text-lg text-zinc-400 max-w-xl">
+          <p className="text-lg text-[var(--ink)] leading-relaxed font-medium">
             Lioran Developer Environment Platform is an end-to-end
             developer infrastructure ecosystem designed to eliminate
             architectural complexity, reduce development cost, and remove
             dependency on fragmented foreign SaaS tools.
           </p>
 
-          <p className="mt-6 text-zinc-500 leading-relaxed">
+          <p className="text-[var(--body)] leading-relaxed">
             LDEP is not a collection of services. It is a unified
             developer operating platform providing databases,
             authentication, storage, deployments, payments,
@@ -73,179 +75,186 @@ export default function PageClient() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="w-full rounded-2xl border border-zinc-800 bg-zinc-950 p-10"
+          className="card p-8 border border-[var(--hairline-strong)] bg-[var(--surface-card)]"
         >
-          <h3 className="text-xl font-semibold">
-            Request Beta Access
-          </h3>
+          <div className="space-y-1">
+            <span className="caption-uppercase text-[var(--muted)]">Early Access</span>
+            <h3 className="title-md">Request Beta Access</h3>
+            <p className="text-xs text-[var(--body)]">
+              Limited to the first 100 developers.
+            </p>
+          </div>
 
-          <p className="mt-2 text-sm text-zinc-500">
-            Limited to the first 100 developers.
-          </p>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-medium text-[var(--body)] block mb-1.5">First Name</label>
+              <input
+                required
+                placeholder="Aarav"
+                value={form.firstName}
+                onChange={(e) =>
+                  setForm({ ...form, firstName: e.target.value })
+                }
+                className="site-input"
+              />
+            </div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-medium text-[var(--body)] block mb-1.5">Last Name</label>
+              <input
+                required
+                placeholder="Sharma"
+                value={form.lastName}
+                onChange={(e) =>
+                  setForm({ ...form, lastName: e.target.value })
+                }
+                className="site-input"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="text-xs font-medium text-[var(--body)] block mb-1.5">Email Address</label>
             <input
               required
-              placeholder="First Name"
-              value={form.firstName}
+              type="email"
+              placeholder="developer@company.com"
+              value={form.email}
               onChange={(e) =>
-                setForm({ ...form, firstName: e.target.value })
+                setForm({ ...form, email: e.target.value })
               }
-              className="bg-black border border-zinc-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-white/20"
-            />
-
-            <input
-              required
-              placeholder="Last Name"
-              value={form.lastName}
-              onChange={(e) =>
-                setForm({ ...form, lastName: e.target.value })
-              }
-              className="bg-black border border-zinc-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-white/20"
+              className="site-input"
             />
           </div>
 
-          <input
-            required
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-            className="mt-4 w-full bg-black border border-zinc-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-white/20"
-          />
-
-          <label className="mt-4 flex items-center gap-3 text-sm text-zinc-400">
-  <input
-    type="checkbox"
-    checked={form.updates}
-    onChange={(e) =>
-      setForm({ ...form, updates: e.target.checked })
-    }
-    className="w-4 h-4 accent-emerald-500 bg-zinc-900 border border-zinc-600 rounded"
-  />
-  Receive platform updates and early features
-</label>
+          <label className="mt-5 flex items-center gap-3 text-sm text-[var(--body)] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.updates}
+              onChange={(e) =>
+                setForm({ ...form, updates: e.target.checked })
+              }
+              className="w-4 h-4 rounded border-[var(--hairline-strong)] text-[var(--ink)] focus:ring-[var(--ink)]"
+            />
+            <span>Receive platform updates and early features</span>
+          </label>
 
           <button
+            type="submit"
             disabled={loading}
-            className="
-    mt-6 w-full rounded-xl 
-    bg-white/90 text-black font-medium py-3
-    transition-all duration-150
-
-    hover:bg-zinc-100
-    active:bg-zinc-300
-    focus:outline-none focus:ring-2 focus:ring-white/30
-
-    disabled:opacity-50 disabled:cursor-not-allowed
-  "
+            className="button-primary w-full mt-6 flex items-center justify-center gap-2"
           >
-            {loading ? "Registering..." : "Request Beta Access"}
+            <span>{loading ? "Registering..." : "Request Beta Access"}</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
 
           {msg && (
-            <p className="mt-4 text-sm text-center text-zinc-400">
-              {msg}
-            </p>
+            <div className={`mt-4 p-3 rounded-md text-sm text-center border ${
+              msg.type === "success"
+                ? "bg-[#16a34a]/10 border-[#16a34a]/30 text-[#16a34a]"
+                : "bg-[#dc2626]/10 border-[#dc2626]/30 text-[#dc2626]"
+            }`}>
+              {msg.text}
+            </div>
           )}
         </form>
       </section>
 
       {/* OVERVIEW */}
-      <section className="border-t border-zinc-900">
-        <div className="max-w-7xl mx-auto px-6 py-28 space-y-28">
+      <section className="section-block pt-8 border-t border-[var(--hairline)]">
+        {/* Problem */}
+        <div className="space-y-4 max-w-4xl">
+          <span className="caption-uppercase text-[var(--muted)]">Background</span>
+          <h2 className="display-md">Why LDEP Exists</h2>
 
-          {/* Problem */}
-          <div>
-            <h2 className="text-4xl font-bold">
-              Why LDEP Exists
-            </h2>
+          <p className="text-[var(--body)] leading-relaxed">
+            Modern software development is built on fragmented tooling.
+            Developers are forced to integrate multiple SaaS platforms
+            for databases, authentication, file storage, deployment,
+            payments, container orchestration, and monitoring.
+            Each system introduces its own operational overhead,
+            billing complexity, vendor lock-in, performance limits,
+            and architectural friction.
+          </p>
 
-            <p className="mt-6 text-zinc-400 leading-relaxed max-w-4xl">
-              Modern software development is built on fragmented tooling.
-              Developers are forced to integrate multiple SaaS platforms
-              for databases, authentication, file storage, deployment,
-              payments, container orchestration, and monitoring.
-              Each system introduces its own operational overhead,
-              billing complexity, vendor lock-in, performance limits,
-              and architectural friction.
-            </p>
+          <p className="text-[var(--body)] leading-relaxed">
+            This fragmentation leads to slower development cycles,
+            fragile system design, unpredictable infrastructure cost,
+            and unnecessary cognitive load on engineering teams.
+          </p>
+        </div>
 
-            <p className="mt-6 text-zinc-400 leading-relaxed max-w-4xl">
-              This fragmentation leads to slower development cycles,
-              fragile system design, unpredictable infrastructure cost,
-              and unnecessary cognitive load on engineering teams.
-            </p>
-          </div>
+        {/* Solution */}
+        <div className="space-y-6 pt-8">
+          <div className="space-y-2 max-w-4xl">
+            <span className="caption-uppercase text-[var(--muted)]">Platform Architecture</span>
+            <h2 className="display-md">The LDEP Architecture</h2>
 
-          {/* Solution */}
-          <div>
-            <h2 className="text-4xl font-bold">
-              The LDEP Architecture
-            </h2>
-
-            <p className="mt-6 text-zinc-400 leading-relaxed max-w-4xl">
+            <p className="text-[var(--body)] leading-relaxed">
               LDEP replaces fragmented infrastructure with a single,
               deeply integrated platform. It acts as the unified
               control layer, developer interface, SDK provider,
               and infrastructure orchestrator.
             </p>
+          </div>
 
-            <div className="mt-10 grid md:grid-cols-3 gap-6">
-              {[
-                ["LioranDB", "Document database with built-in CQRS"],
-                ["LioranAuth", "Authentication & authorization"],
-                ["LioranBastion", "Cloud storage & asset management"],
-                ["LioranDeployments", "Node.js & Next.js deployments"],
-                ["LioranContainers", "Container registry & orchestration"],
-                ["LioranPayments", "Integrated payment infrastructure"],
-                ["LioranP2P", "Decentralized database & storage network"],
-              ].map(([title, desc]) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              ["LioranDB", "Document database with built-in CQRS", Terminal],
+              ["LioranAuth", "Authentication & authorization", ShieldCheck],
+              ["LioranBastion", "Cloud storage & asset management", Layers3],
+              ["LioranDeployments", "Node.js & Next.js deployments", Terminal],
+              ["LioranContainers", "Container registry & orchestration", Layers3],
+              ["LioranPayments", "Integrated payment infrastructure", CheckCircle2],
+              ["LioranP2P", "Decentralized database & storage network", Network],
+            ].map(([title, desc, Icon]) => {
+              const IconComponent = Icon as React.ComponentType<{ className?: string }>;
+              return (
                 <div
-                  key={title}
-                  className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5"
+                  key={title as string}
+                  className="card p-5"
                 >
-                  <div className="font-semibold">{title}</div>
-                  <div className="mt-1 text-sm text-zinc-500">
-                    {desc}
+                  <div className="flex items-center gap-2">
+                    <IconComponent className="w-4 h-4 text-[var(--ink)]" />
+                    <div className="font-semibold text-[var(--ink)]">{title as string}</div>
+                  </div>
+                  <div className="mt-2 text-sm text-[var(--body)]">
+                    {desc as string}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* P2P */}
-          <div>
-            <h2 className="text-4xl font-bold">
-              LioranP2P — Infrastructure Beyond Cloud
-            </h2>
-
-            <p className="mt-6 text-zinc-400 leading-relaxed max-w-4xl">
-              LioranP2P is a peer-to-peer database and storage
-              infrastructure that operates alongside traditional
-              cloud systems. It allows real-world devices to act as
-              live computing nodes inside a global distributed network.
-            </p>
-
-            <p className="mt-6 text-zinc-400 leading-relaxed max-w-4xl">
-              By converting laptops and mobile devices into secure
-              infrastructure nodes, LioranP2P enables extreme cost
-              reduction, massive scalability, and unprecedented
-              fault tolerance — while maintaining enterprise-grade
-              reliability and performance.
-            </p>
-
-            <p className="mt-6 text-zinc-400 leading-relaxed max-w-4xl">
-              This hybrid architecture unlocks a new class of
-              infrastructure systems where centralized cloud and
-              decentralized networks operate together, forming
-              the foundation of next-generation distributed computing.
-            </p>
+              );
+            })}
           </div>
         </div>
+
+        {/* P2P */}
+        <div className="space-y-4 max-w-4xl pt-8 border-t border-[var(--hairline)]">
+          <span className="caption-uppercase text-[var(--muted)]">Decentralized Mesh</span>
+          <h2 className="display-md">LioranP2P — Infrastructure Beyond Cloud</h2>
+
+          <p className="text-[var(--body)] leading-relaxed">
+            LioranP2P is a peer-to-peer database and storage
+            infrastructure that operates alongside traditional
+            cloud systems. It allows real-world devices to act as
+            live computing nodes inside a global distributed network.
+          </p>
+
+          <p className="text-[var(--body)] leading-relaxed">
+            By converting laptops and mobile devices into secure
+            infrastructure nodes, LioranP2P enables extreme cost
+            reduction, massive scalability, and unprecedented
+            fault tolerance — while maintaining enterprise-grade
+            reliability and performance.
+          </p>
+
+          <p className="text-[var(--body)] leading-relaxed">
+            This hybrid architecture unlocks a new class of
+            infrastructure systems where centralized cloud and
+            decentralized networks operate together, forming
+            the foundation of next-generation distributed computing.
+          </p>
+        </div>
       </section>
-    </main>
+    </div>
   );
 }

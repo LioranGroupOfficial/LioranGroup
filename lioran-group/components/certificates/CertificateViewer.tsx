@@ -672,8 +672,7 @@ export default function CertificateViewer({ certificate }: Props) {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, rgba(148,137,121,0.22), transparent 40%), var(--bg)",
+        backgroundColor: "var(--canvas)",
         padding: "48px 16px 80px",
       }}
     >
@@ -725,11 +724,10 @@ export default function CertificateViewer({ certificate }: Props) {
           style={{
             padding: 0,
             overflow: "hidden",
-            background: "#222831",
-            border: "1px solid #948979",
-            borderRadius: 4,
+            background: "#171717",
+            border: "1px solid var(--hairline-strong)",
+            borderRadius: 12,
             color: "#f8f5ed",
-            boxShadow: "0 24px 70px rgba(0, 0, 0, 0.28)",
           }}
         >
           <div
@@ -737,8 +735,7 @@ export default function CertificateViewer({ certificate }: Props) {
               position: "relative",
               padding: "52px 42px",
               overflow: "hidden",
-              background:
-                "linear-gradient(135deg, #222831 0%, #2b313a 52%, #393e46 100%)",
+              background: "#171717",
             }}
           >
             <div

@@ -88,7 +88,8 @@ export default function Footer() {
             Version {siteVersion} · Chandrapur, Maharashtra, India
           </p>
           <p className="footer-meta">
-            Contact: <a href="mailto:contact@lioran.group">contact@lioran.group</a>
+            Contact:{" "}
+            <a href="mailto:contact@lioran.group">contact@lioran.group</a>
           </p>
         </div>
 
@@ -97,11 +98,9 @@ export default function Footer() {
 
           return (
             <div key={section.title} className="footer-group">
-              <h4 className="card-title">
-                <span className="card-title-inner">
-                  <SectionIcon className="card-title-icon" />
-                  <span>{section.title}</span>
-                </span>
+              <h4 className="flex items-center gap-2">
+                <SectionIcon className="w-3.5 h-3.5 text-[var(--muted)]" />
+                <span>{section.title}</span>
               </h4>
               <ul className="footer-links">
                 {section.links.map((link) => {
@@ -109,7 +108,7 @@ export default function Footer() {
 
                   return (
                     <li key={link.href}>
-                      <Link href={link.href} className="nav-link">
+                      <Link href={link.href}>
                         <LinkIcon className="footer-link-icon" />
                         <span>{link.label}</span>
                       </Link>
@@ -140,7 +139,7 @@ export default function Footer() {
         })}
       </div>
 
-      <div className="site-shell-wide">
+      <div className="site-shell-wide" style={{ marginTop: "24px" }}>
         <p className="footer-meta">
           © {new Date().getFullYear()} Lioran Group. Parent organization of LDS
           and the Lioran ecosystem.

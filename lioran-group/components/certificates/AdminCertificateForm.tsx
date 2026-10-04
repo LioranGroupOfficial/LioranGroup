@@ -230,8 +230,8 @@ export default function AdminCertificateForm({
         />
       </label>
 
-      {error ? <p style={{ color: "#fca5a5", margin: 0 }}>{error}</p> : null}
-      {success ? <p style={{ color: "#86efac", margin: 0 }}>{success}</p> : null}
+      {error ? <p style={{ color: "var(--semantic-error)", margin: 0 }}>{error}</p> : null}
+      {success ? <p style={{ color: "var(--semantic-success)", margin: 0 }}>{success}</p> : null}
 
       <div className="button-row">
         <button

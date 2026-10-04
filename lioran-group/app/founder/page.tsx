@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Award,
   BookUser,
@@ -18,14 +19,15 @@ export default function FounderPage() {
         <div
           style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}
         >
-          <img
+          <Image
             src="https://avatars.githubusercontent.com/u/79976106?v=4"
             alt="Swaraj Puppalwar"
-            width="112"
-            height="112"
+            width={112}
+            height={112}
+            unoptimized
             style={{
               borderRadius: "999px",
-              border: "1px solid var(--border)",
+              border: "1px solid var(--hairline-strong)",
               objectFit: "cover",
             }}
           />
@@ -65,7 +67,7 @@ export default function FounderPage() {
           <ul className="plain-list">
             <li>Clean code is better than fancy patterns.</li>
             <li>Ship fast, cry later, fix on weekends.</li>
-            <li>"It works on my machine" is not a deployment strategy.</li>
+            <li>&quot;It works on my machine&quot; is not a deployment strategy.</li>
             <li>Indian data should stay in India. Period.</li>
           </ul>
         </article>
@@ -109,7 +111,7 @@ export default function FounderPage() {
             <li>Cyber Olympiad State Rank 1.</li>
             <li>International Computer Olympiad State Rank 30.</li>
             <li>International Mathematics Olympiad State Rank 30.</li>
-            <li>Participated in the 30th National Children's Science Congress.</li>
+            <li>Participated in the 30th National Children&apos;s Science Congress.</li>
             <li>Certificate of Excellence in Exam Pe Charcha 2023.</li>
           </ul>
         </article>
@@ -128,8 +130,8 @@ export default function FounderPage() {
         <article className="card">
           <CardTitle icon={Quote}>Quote</CardTitle>
           <p className="card-copy">
-            "I don't always write perfect code... but when I do, it's after 47
-            failed attempts and one very strong coffee."
+            &quot;I don&apos;t always write perfect code... but when I do, it&apos;s after 47
+            failed attempts and one very strong coffee.&quot;
           </p>
         </article>
       </section>

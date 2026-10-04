@@ -45,10 +45,10 @@ export default async function OpenGraphImage({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "#020617",
-            color: "#fff",
+            background: "#171717",
+            color: "#ffffff",
             fontSize: 48,
-            fontWeight: 800,
+            fontWeight: 700,
           }}
         >
           Certificate Not Found
@@ -67,20 +67,19 @@ export default async function OpenGraphImage({
           height: "630px",
           display: "flex",
           flexDirection: "column",
-          background:
-            "linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%)",
-          color: "#fff",
-          fontFamily: "Arial, sans-serif",
+          background: "#171717",
+          color: "#ffffff",
+          fontFamily: "sans-serif",
+          border: "16px solid #232328",
         }}
       >
         {/* Top bar */}
         <div
           style={{
             display: "flex",
-            height: "8px",
+            height: "4px",
             width: "100%",
-            // background:
-            //   "linear-gradient(90deg,#3b82f6,#8b5cf6,#ec4899,#f59e0b)",
+            background: "#34343c",
           }}
         />
 
@@ -102,10 +101,10 @@ export default async function OpenGraphImage({
             }}
           >
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: 16, color: "#93c5fd", letterSpacing: 2 }}>
+              <span style={{ fontSize: 14, color: "#9ea3ae", letterSpacing: 2, textTransform: "uppercase" }}>
                 CERTIFICATE OF
               </span>
-              <span style={{ fontSize: 36, fontWeight: 900 }}>
+              <span style={{ fontSize: 32, fontWeight: 700, color: "#ffffff" }}>
                 ACHIEVEMENT
               </span>
             </div>
@@ -117,11 +116,11 @@ export default async function OpenGraphImage({
                 alignItems: "flex-end",
               }}
             >
-              <span style={{ fontSize: 14, color: "#94a3b8" }}>
+              <span style={{ fontSize: 13, color: "#9ea3ae" }}>
                 Issued by
               </span>
               <span
-                style={{ fontSize: 20, fontWeight: 700, color: "#3b82f6" }}
+                style={{ fontSize: 18, fontWeight: 600, color: "#ffffff" }}
               >
                 {certificate.organization}
               </span>
@@ -136,23 +135,22 @@ export default async function OpenGraphImage({
               alignItems: "center",
             }}
           >
-            <span style={{ fontSize: 18, color: "#94a3b8" }}>
+            <span style={{ fontSize: 16, color: "#9ea3ae" }}>
               This certificate is proudly presented to
             </span>
 
             <span
               style={{
-                fontSize: 56,
-                fontWeight: 900,
-                // background: "linear-gradient(135deg,#3b82f6,#8b5cf6)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                fontSize: 52,
+                fontWeight: 700,
+                color: "#ffffff",
+                margin: "12px 0 6px",
               }}
             >
               {certificate.name}
             </span>
 
-            <span style={{ fontSize: 26, fontWeight: 600 }}>
+            <span style={{ fontSize: 22, fontWeight: 500, color: "#38bdf8" }}>
               {certificate.role}
             </span>
           </div>
@@ -162,13 +160,15 @@ export default async function OpenGraphImage({
             style={{
               display: "flex",
               justifyContent: "space-between",
+              borderTop: "1px solid #34343c",
+              paddingTop: "24px",
             }}
           >
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: 14, color: "#94a3b8" }}>
+              <span style={{ fontSize: 13, color: "#9ea3ae" }}>
                 Certificate ID
               </span>
-              <span style={{ fontSize: 18, fontWeight: 700 }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: "#ffffff" }}>
                 {certificate.certificateId}
               </span>
             </div>
@@ -180,10 +180,10 @@ export default async function OpenGraphImage({
                 alignItems: "flex-end",
               }}
             >
-              <span style={{ fontSize: 14, color: "#94a3b8" }}>
+              <span style={{ fontSize: 13, color: "#9ea3ae" }}>
                 Signed By
               </span>
-              <span style={{ fontSize: 18, fontWeight: 700 }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: "#ffffff" }}>
                 {certificate.issuedBy}
               </span>
             </div>
