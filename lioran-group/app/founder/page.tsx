@@ -1,138 +1,202 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import Link from "next/link";
 import {
-  Award,
-  BookUser,
+  ArrowRight,
   BriefcaseBusiness,
-  ChartColumn,
-  FlaskConical,
-  Quote,
-  Trophy,
-  UserRound,
+  Building2,
+  Database,
+  ExternalLink,
+  Github,
+  Globe,
+  HardDrive,
+  Settings2,
 } from "lucide-react";
 import CardTitle from "@/components/CardTitle";
+import { githubUrl } from "@/app/lib/site";
+
+export const metadata: Metadata = {
+  title: "Swaraj Puppalwar — Founder & CTO | Lioran Group",
+  description:
+    "Professional profile for Swaraj Puppalwar, Founder and CTO of Lioran Group, focused on database systems, backend infrastructure, and developer tools.",
+};
+
+const technicalFocus = [
+  "Database systems and storage engines",
+  "Rust and backend infrastructure",
+  "Distributed systems",
+  "Developer tools and cloud infrastructure",
+  "Full-stack software engineering",
+];
+
+function ExternalLinkLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <span>{children}</span>
+      <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+    </>
+  );
+}
 
 export default function FounderPage() {
   return (
     <div className="page-shell page-grid">
-      <section className="page-intro">
+      <section className="page-intro" aria-labelledby="founder-name">
         <span className="eyebrow">Founder</span>
-        <div
-          style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}
-        >
-          <Image
-            src="https://avatars.githubusercontent.com/u/79976106?v=4"
-            alt="Swaraj Puppalwar"
-            width={112}
-            height={112}
-            unoptimized
-            style={{
-              borderRadius: "999px",
-              border: "1px solid var(--hairline-strong)",
-              objectFit: "cover",
-            }}
-          />
-          <div style={{ display: "grid", gap: 8 }}>
-            <h1>Swaraj Puppalwar</h1>
-            <p className="text-soft">UltronTheAI 👾</p>
-          </div>
+        <div>
+          <h1 id="founder-name">Swaraj Puppalwar</h1>
+          <p className="mt-2 text-soft">Founder &amp; CTO, Lioran Group</p>
         </div>
         <p>
-          The guy who started coding at 11 and still has not touched grass
-          since. Founder and CTO at Lioran Group, leading LDS and shipping real
-          products instead of tweeting about them.
+          Swaraj Puppalwar is the Founder and CTO of Lioran Group, working on
+          database systems, backend infrastructure, and developer tools.
         </p>
       </section>
 
-      <section className="card-grid two-column">
+      <section className="section-block" aria-labelledby="current-work">
+        <div className="section-heading">
+          <h2 id="current-work">Current work</h2>
+          <p>
+            Technical responsibilities span architecture, implementation, and
+            the operation of products developed under Lioran Developer
+            Solutions.
+          </p>
+        </div>
+
         <article className="card">
-          <CardTitle icon={UserRound}>Huh, who is he?</CardTitle>
-          <p className="card-copy">
-            Swaraj Puppalwar is a full-stack developer with 2 years of real
-            production experience. He writes TypeScript heavily, breaks things
-            in Rust for science, and keeps multiple products alive.
-          </p>
-          <p className="card-copy">
-            Founder and CTO at Lioran Group, leading 2 developers and advising
-            startup friends when chai is involved.
-          </p>
-          <p className="card-copy">
-            Portfolio: <a href="https://swaraj.lioransolutions.com" target="_blank" rel="noreferrer">swaraj.lioransolutions.com</a>
-          </p>
-          <p className="card-copy">
-            GitHub Org: <a href="https://github.com/LioranGroupOfficial" target="_blank" rel="noreferrer">LioranGroupOfficial</a>
-          </p>
-        </article>
-        <article className="card">
-          <CardTitle icon={FlaskConical}>Engineering Vibe</CardTitle>
+          <CardTitle icon={BriefcaseBusiness}>Engineering responsibilities</CardTitle>
           <ul className="plain-list">
-            <li>Clean code is better than fancy patterns.</li>
-            <li>Ship fast, cry later, fix on weekends.</li>
-            <li>&quot;It works on my machine&quot; is not a deployment strategy.</li>
-            <li>Indian data should stay in India. Period.</li>
+            <li>Designing database and storage systems.</li>
+            <li>Building Rust services and backend infrastructure.</li>
+            <li>Working on distributed systems and developer tooling.</li>
+            <li>Supporting product architecture across Lioran Group and LDS.</li>
           </ul>
         </article>
       </section>
 
-      <section className="card-grid two-column">
+      <section className="section-block" aria-labelledby="selected-projects">
+        <div className="section-heading">
+          <h2 id="selected-projects">Selected projects</h2>
+          <p>Current and related engineering work, described plainly.</p>
+        </div>
+
+        <div className="card-grid two-column">
+          <article className="card">
+            <CardTitle icon={Database}>LioranDB</CardTitle>
+            <p className="card-copy">
+              A Rust-powered document database developed under Lioran Developer
+              Solutions, with work spanning storage, backend services, and
+              product infrastructure.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <Link href="/companies/lcs/products" className="button-link">
+                <span>Product details</span>
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
+              <a
+                href="https://liorandb.com"
+                target="_blank"
+                rel="noreferrer"
+                className="button-link"
+              >
+                <ExternalLinkLabel>liorandb.com</ExternalLinkLabel>
+              </a>
+            </div>
+          </article>
+
+          <article className="card">
+            <CardTitle icon={HardDrive}>LioranDB Cloud</CardTitle>
+            <p className="card-copy">
+              Cloud infrastructure and product work related to the LioranDB
+              database platform.
+            </p>
+            <div className="pt-2">
+              <a
+                href="https://app.liorandb.com"
+                target="_blank"
+                rel="noreferrer"
+                className="button-link"
+              >
+                <ExternalLinkLabel>Open dashboard</ExternalLinkLabel>
+              </a>
+            </div>
+          </article>
+
+          <article className="card">
+            <CardTitle icon={Building2}>Developer infrastructure</CardTitle>
+            <p className="card-copy">
+              Related infrastructure projects covering developer environments,
+              backend services, and the systems around LDS products.
+            </p>
+            <div className="pt-2">
+              <Link href="/ldep" className="button-link">
+                <span>View platform work</span>
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-block" aria-labelledby="technical-focus">
+        <div className="section-heading">
+          <h2 id="technical-focus">Technical focus</h2>
+          <p>Areas of ongoing engineering work.</p>
+        </div>
+
         <article className="card">
-          <CardTitle icon={ChartColumn}>Platform Metrics</CardTitle>
+          <CardTitle icon={Settings2}>Engineering domains</CardTitle>
           <ul className="plain-list">
-            <li>Post-Acle: around 100 monthly readers.</li>
-            <li>Vortexly: 23 friends, 17 active, 98 posts and 16 reels.</li>
-            <li>Others: Rust when dangerous, Python for life-saving scripts.</li>
-          </ul>
-        </article>
-        <article className="card">
-          <CardTitle icon={BriefcaseBusiness}>Systems and Products</CardTitle>
-          <ul className="plain-list">
-            <li>Lioran Auth: authentication that does not sell your soul.</li>
-            <li>Lioran Deployments: CI/CD that sometimes works on first try.</li>
-            <li>LioranDB: lightweight local-first document DB with 10 plus pilot clients.</li>
-            <li>Hushar Spreadsheet: MVP with paying customers.</li>
-            <li>AiCompanion, DEAD-CORRIDOR, MeetFound, P2P-Chat, Sanyam, and more.</li>
+            {technicalFocus.map((area) => (
+              <li key={area}>{area}</li>
+            ))}
           </ul>
         </article>
       </section>
 
-      <section className="card-grid two-column">
-        <article className="card">
-          <CardTitle icon={Award}>Recognition</CardTitle>
-          <ul className="plain-list">
-            <li>Nagpur Post feature on May 23, 2023.</li>
-            <li>Navarashtra Chandrapur Edition feature on May 23, 2023.</li>
-            <li>Tarun Bharat Purva Vidarbha Edition feature on May 29, 2023.</li>
-            <li>Listed among top Indian GitHub contributors and active developers.</li>
-          </ul>
-        </article>
-        <article className="card">
-          <CardTitle icon={Trophy}>Academic and Technical Achievements</CardTitle>
-          <ul className="plain-list">
-            <li>Crest Cyber Olympiad Western Region Rank 17.</li>
-            <li>Cyber Olympiad State Rank 1.</li>
-            <li>International Computer Olympiad State Rank 30.</li>
-            <li>International Mathematics Olympiad State Rank 30.</li>
-            <li>Participated in the 30th National Children&apos;s Science Congress.</li>
-            <li>Certificate of Excellence in Exam Pe Charcha 2023.</li>
-          </ul>
-        </article>
-      </section>
+      <section className="section-block" aria-labelledby="founder-links">
+        <div className="section-heading">
+          <h2 id="founder-links">Links</h2>
+          <p>Company, product, and engineering references.</p>
+        </div>
 
-      <section className="card-grid two-column">
         <article className="card">
-          <CardTitle icon={BookUser}>Connect</CardTitle>
+          <CardTitle icon={Globe}>Public references</CardTitle>
           <ul className="plain-list">
-            <li><a href="https://swaraj.lioransolutions.com" target="_blank" rel="noreferrer">Portfolio</a></li>
-            <li><a href="https://lioran.group" target="_blank" rel="noreferrer">Lioran Group</a></li>
-            <li><a href="https://github.com/LioranGroupOfficial" target="_blank" rel="noreferrer">GitHub Org</a></li>
-            <li><a href="https://twitter.com/PuppalwarSwaraj" target="_blank" rel="noreferrer">Twitter</a></li>
+            <li>
+              <a
+                href="https://swaraj.lioransolutions.com"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Globe className="mr-2 inline-block h-4 w-4" aria-hidden="true" />
+                Professional profile
+              </a>
+            </li>
+            <li>
+              <a href={githubUrl} target="_blank" rel="noreferrer">
+                <Github className="mr-2 inline-block h-4 w-4" aria-hidden="true" />
+                Lioran Group on GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://lioran.group" target="_blank" rel="noreferrer">
+                <Globe className="mr-2 inline-block h-4 w-4" aria-hidden="true" />
+                Lioran Group
+              </a>
+            </li>
+            <li>
+              <a href="https://lioransolutions.com" target="_blank" rel="noreferrer">
+                <Building2 className="mr-2 inline-block h-4 w-4" aria-hidden="true" />
+                Lioran Developer Solutions
+              </a>
+            </li>
+            <li>
+              <a href="https://liorandb.com" target="_blank" rel="noreferrer">
+                <Database className="mr-2 inline-block h-4 w-4" aria-hidden="true" />
+                LioranDB
+              </a>
+            </li>
           </ul>
-        </article>
-        <article className="card">
-          <CardTitle icon={Quote}>Quote</CardTitle>
-          <p className="card-copy">
-            &quot;I don&apos;t always write perfect code... but when I do, it&apos;s after 47
-            failed attempts and one very strong coffee.&quot;
-          </p>
         </article>
       </section>
     </div>
